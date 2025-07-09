@@ -1,0 +1,154 @@
+import React from 'react';
+import { StyleSheet, ScrollView, TouchableOpacity, Alert } from 'react-native';
+import { router } from 'expo-router';
+import { Text, View } from '@/components/Themed';
+import { useAuth } from '@/contexts/AuthContext';
+
+export default function ProfileScreen() {
+  const { userProfile, logout } = useAuth();
+
+  const handleLogout = () => {
+    Alert.alert(
+      'Logout',
+      'Are you sure you want to logout?',
+      [
+        {
+          text: 'Cancel',
+          style: 'cancel',
+        },
+        {
+          text: 'Logout',
+          style: 'destructive',
+          onPress: async () => {
+            try {
+              await logout();
+              router.replace('/(auth)/login');
+            } catch (error) {
+              console.error('Logout error:', error);
+            }
+          },
+        },
+      ]
+    );
+  };
+
+  return (
+    <ScrollView style={styles.container}>
+      <View style={styles.header}>
+        <Text style={styles.title}>Profile</Text>
+        <Text style={styles.subtitle}>Manage your account</Text>
+      </View>
+
+      <View style={styles.profileSection}>
+        <View style={styles.profileItem}>
+          <Text style={styles.profileLabel}>Name</Text>
+          <Text style={styles.profileValue}>{userProfile?.displayName || 'Not set'}</Text>
+        </View>
+
+        <View style={styles.profileItem}>
+          <Text style={styles.profileLabel}>Email</Text>
+          <Text style={styles.profileValue}>{userProfile?.email}</Text>
+        </View>
+
+        <View style={styles.profileItem}>
+          <Text style={styles.profileLabel}>Phone</Text>
+          <Text style={styles.profileValue}>{userProfile?.phoneNumber || 'Not set'}</Text>
+        </View>
+
+        <View style={styles.profileItem}>
+          <Text style={styles.profileLabel}>Address</Text>
+          <Text style={styles.profileValue}>{userProfile?.address || 'Not set'}</Text>
+        </View>
+
+        <View style={styles.profileItem}>
+          <Text style={styles.profileLabel}>Role</Text>
+          <Text style={styles.profileValue}>{userProfile?.role}</Text>
+        </View>
+      </View>
+
+      <View style={styles.actionsSection}>
+        <TouchableOpacity style={styles.actionButton}>
+          <Text style={styles.actionButtonText}>Edit Profile</Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity style={styles.actionButton}>
+          <Text style={styles.actionButtonText}>Order History</Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity style={styles.actionButton}>
+          <Text style={styles.actionButtonText}>Settings</Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity style={[styles.actionButton, styles.logoutButton]} onPress={handleLogout}>
+          <Text style={[styles.actionButtonText, styles.logoutButtonText]}>Logout</Text>
+        </TouchableOpacity>
+      </View>
+    </ScrollView>
+  );
+}
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: '#f5f5f5',
+  },
+  header: {
+    padding: 20,
+    alignItems: 'center',
+    backgroundColor: '#fff',
+    marginBottom: 20,
+  },
+  title: {
+    fontSize: 28,
+    fontWeight: 'bold',
+    color: '#333',
+    marginBottom: 8,
+  },
+  subtitle: {
+    fontSize: 16,
+    color: '#666',
+  },
+  profileSection: {
+    backgroundColor: '#fff',
+    marginBottom: 20,
+  },
+  profileItem: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    padding: 16,
+    borderBottomWidth: 1,
+    borderBottomColor: '#eee',
+  },
+  profileLabel: {
+    fontSize: 16,
+    color: '#333',
+    fontWeight: '500',
+  },
+  profileValue: {
+    fontSize: 16,
+    color: '#666',
+  },
+  actionsSection: {
+    backgroundColor: '#fff',
+    marginBottom: 20,
+  },
+  actionButton: {
+    backgroundColor: '#007AFF',
+    margin: 16,
+    padding: 16,
+    borderRadius: 8,
+    alignItems: 'center',
+  },
+  actionButtonText: {
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: '600',
+  },
+  logoutButton: {
+    backgroundColor: '#dc3545',
+  },
+  logoutButtonText: {
+    color: '#fff',
+  },
+}); 

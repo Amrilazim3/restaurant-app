@@ -1,31 +1,122 @@
-import { StyleSheet } from 'react-native';
-
-import EditScreenInfo from '@/components/EditScreenInfo';
+import React from 'react';
+import { StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
+import { router } from 'expo-router';
 import { Text, View } from '@/components/Themed';
+import { useAuth } from '@/contexts/AuthContext';
 
-export default function TabOneScreen() {
+export default function HomeScreen() {
+  const { userProfile } = useAuth();
+
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Tab One</Text>
-      <View style={styles.separator} lightColor="#eee" darkColor="rgba(255,255,255,0.1)" />
-      <EditScreenInfo path="app/(tabs)/index.tsx" />
-    </View>
+    <ScrollView style={styles.container}>
+      <View style={styles.header}>
+        <Text style={styles.title}>Block Twenty-9</Text>
+        <Text style={styles.subtitle}>Welcome back, {userProfile?.displayName || 'Guest'}!</Text>
+      </View>
+
+      <View style={styles.section}>
+        <Text style={styles.sectionTitle}>Quick Actions</Text>
+        
+        <TouchableOpacity 
+          style={styles.actionButton}
+          onPress={() => router.push('/(tabs)/menu')}
+        >
+          <Text style={styles.actionButtonText}>Browse Menu</Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity 
+          style={styles.actionButton}
+          onPress={() => router.push('/(tabs)/cart')}
+        >
+          <Text style={styles.actionButtonText}>View Cart</Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity 
+          style={styles.actionButton}
+          onPress={() => router.push('/(tabs)/orders')}
+        >
+          <Text style={styles.actionButtonText}>My Orders</Text>
+        </TouchableOpacity>
+      </View>
+
+      <View style={styles.section}>
+        <Text style={styles.sectionTitle}>Featured Items</Text>
+        <View style={styles.featuredItem}>
+          <Text style={styles.featuredItemName}>Signature Burger</Text>
+          <Text style={styles.featuredItemPrice}>$12.99</Text>
+        </View>
+        <View style={styles.featuredItem}>
+          <Text style={styles.featuredItemName}>Truffle Fries</Text>
+          <Text style={styles.featuredItemPrice}>$8.99</Text>
+        </View>
+        <View style={styles.featuredItem}>
+          <Text style={styles.featuredItemName}>Craft Beer</Text>
+          <Text style={styles.featuredItemPrice}>$5.99</Text>
+        </View>
+      </View>
+    </ScrollView>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    backgroundColor: '#f5f5f5',
+  },
+  header: {
+    padding: 20,
     alignItems: 'center',
-    justifyContent: 'center',
+    backgroundColor: '#fff',
+    marginBottom: 20,
   },
   title: {
+    fontSize: 28,
+    fontWeight: 'bold',
+    color: '#333',
+    marginBottom: 8,
+  },
+  subtitle: {
+    fontSize: 16,
+    color: '#666',
+  },
+  section: {
+    backgroundColor: '#fff',
+    marginBottom: 20,
+    padding: 20,
+  },
+  sectionTitle: {
     fontSize: 20,
     fontWeight: 'bold',
+    marginBottom: 16,
+    color: '#333',
   },
-  separator: {
-    marginVertical: 30,
-    height: 1,
-    width: '80%',
+  actionButton: {
+    backgroundColor: '#007AFF',
+    padding: 16,
+    borderRadius: 8,
+    marginBottom: 12,
+    alignItems: 'center',
+  },
+  actionButtonText: {
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: '600',
+  },
+  featuredItem: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingVertical: 12,
+    borderBottomWidth: 1,
+    borderBottomColor: '#eee',
+  },
+  featuredItemName: {
+    fontSize: 16,
+    color: '#333',
+  },
+  featuredItemPrice: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    color: '#007AFF',
   },
 });

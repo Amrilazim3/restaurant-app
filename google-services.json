@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "721539899518",
+    "project_id": "retaurant-block-twenty-9",
+    "storage_bucket": "retaurant-block-twenty-9.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:721539899518:android:44bcef895822fd299bf82f",
+        "android_client_info": {
+          "package_name": "rani.app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBYoMiysGPXiaqT-8fVUJ5_zY542qXUwOE"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
