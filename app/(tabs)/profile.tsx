@@ -3,9 +3,11 @@ import { StyleSheet, ScrollView, TouchableOpacity, Alert } from 'react-native';
 import { router } from 'expo-router';
 import { Text, View } from '@/components/Themed';
 import { useAuth } from '@/contexts/AuthContext';
+import { useCart } from '@/contexts/CartContext';
 
 export default function ProfileScreen() {
   const { userProfile, logout } = useAuth();
+  const { cartCount, clearCart } = useCart();
 
   const handleLogout = () => {
     Alert.alert(
@@ -30,6 +32,18 @@ export default function ProfileScreen() {
         },
       ]
     );
+  };
+
+  const handleEditProfile = () => {
+    router.push('/editProfile');
+  };
+
+  const handleChangePassword = () => {
+    router.push('/changePassword');
+  };
+
+  const handleAdminAction = (action: string) => {
+    Alert.alert('Admin Action', `${action} feature coming soon!`);
   };
 
   return (
@@ -62,18 +76,85 @@ export default function ProfileScreen() {
 
         <View style={styles.profileItem}>
           <Text style={styles.profileLabel}>Role</Text>
-          <Text style={styles.profileValue}>{userProfile?.role}</Text>
+          <Text style={[styles.profileValue, styles.roleValue]}>
+            {userProfile?.role === 'admin' ? 'Administrator' : 'User'}
+          </Text>
         </View>
+
+        {cartCount > 0 && (
+          <View style={styles.profileItem}>
+            <Text style={styles.profileLabel}>Cart</Text>
+            <Text style={styles.profileValue}>{cartCount} items</Text>
+          </View>
+        )}
       </View>
 
+      {/* Admin Panel */}
+      {userProfile?.role === 'admin' && (
+        <View style={styles.adminSection}>
+          <Text style={styles.adminTitle}>Admin Panel</Text>
+          <Text style={styles.adminSubtitle}>Administrative functions</Text>
+          
+          <TouchableOpacity 
+            style={styles.adminButton}
+            onPress={() => handleAdminAction('Manage Menus')}
+          >
+            <Text style={styles.adminButtonText}>Manage Menus</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity 
+            style={styles.adminButton}
+            onPress={() => handleAdminAction('Manage Foods')}
+          >
+            <Text style={styles.adminButtonText}>Manage Foods</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity 
+            style={styles.adminButton}
+            onPress={() => handleAdminAction('View Orders')}
+          >
+            <Text style={styles.adminButtonText}>View All Orders</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity 
+            style={styles.adminButton}
+            onPress={() => handleAdminAction('User Management')}
+          >
+            <Text style={styles.adminButtonText}>User Management</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity 
+            style={styles.adminButton}
+            onPress={() => handleAdminAction('Analytics')}
+          >
+            <Text style={styles.adminButtonText}>Analytics & Reports</Text>
+          </TouchableOpacity>
+        </View>
+      )}
+
       <View style={styles.actionsSection}>
-        <TouchableOpacity style={styles.actionButton}>
+        <TouchableOpacity style={styles.actionButton} onPress={handleEditProfile}>
           <Text style={styles.actionButtonText}>Edit Profile</Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity style={styles.actionButton} onPress={handleChangePassword}>
+          <Text style={styles.actionButtonText}>Change Password</Text>
         </TouchableOpacity>
 
         <TouchableOpacity style={styles.actionButton}>
           <Text style={styles.actionButtonText}>Order History</Text>
         </TouchableOpacity>
+
+        {cartCount > 0 && (
+          <TouchableOpacity 
+            style={[styles.actionButton, styles.clearCartButton]} 
+            onPress={clearCart}
+          >
+            <Text style={[styles.actionButtonText, styles.clearCartButtonText]}>
+              Clear Cart ({cartCount})
+            </Text>
+          </TouchableOpacity>
+        )}
 
         <TouchableOpacity style={styles.actionButton}>
           <Text style={styles.actionButtonText}>Settings</Text>
@@ -94,9 +175,8 @@ const styles = StyleSheet.create({
   },
   header: {
     padding: 20,
-    alignItems: 'center',
     backgroundColor: '#fff',
-    marginBottom: 20,
+    alignItems: 'center',
   },
   title: {
     fontSize: 28,
@@ -128,6 +208,40 @@ const styles = StyleSheet.create({
   profileValue: {
     fontSize: 16,
     color: '#666',
+    flex: 1,
+    textAlign: 'right',
+  },
+  roleValue: {
+    fontWeight: '600',
+    color: '#007AFF',
+  },
+  adminSection: {
+    backgroundColor: '#fff',
+    marginBottom: 20,
+    padding: 20,
+  },
+  adminTitle: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    color: '#333',
+    marginBottom: 4,
+  },
+  adminSubtitle: {
+    fontSize: 14,
+    color: '#666',
+    marginBottom: 16,
+  },
+  adminButton: {
+    backgroundColor: '#28a745',
+    marginBottom: 12,
+    padding: 16,
+    borderRadius: 8,
+    alignItems: 'center',
+  },
+  adminButtonText: {
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: '600',
   },
   actionsSection: {
     backgroundColor: '#fff',
@@ -144,6 +258,12 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontSize: 16,
     fontWeight: '600',
+  },
+  clearCartButton: {
+    backgroundColor: '#ffc107',
+  },
+  clearCartButtonText: {
+    color: '#333',
   },
   logoutButton: {
     backgroundColor: '#dc3545',

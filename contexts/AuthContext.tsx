@@ -1,7 +1,7 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { onAuthStateChanged, User } from 'firebase/auth';
 import { auth } from '../services/firebase';
-import { authService, UserProfile } from '../services/authService';
+import { authService, UserProfile, ProfileUpdateData } from '../services/authService';
 
 interface AuthContextType {
   user: User | null;
@@ -10,6 +10,9 @@ interface AuthContextType {
   login: (email: string, password: string) => Promise<void>;
   register: (email: string, password: string, displayName?: string, role?: 'admin' | 'user', adminPasskey?: string) => Promise<void>;
   logout: () => Promise<void>;
+  updateProfile: (updateData: ProfileUpdateData) => Promise<void>;
+  changePassword: (currentPassword: string, newPassword: string) => Promise<void>;
+  refreshProfile: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -60,13 +63,36 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setUserProfile(null);
   };
 
+  const updateProfile = async (updateData: ProfileUpdateData) => {
+    if (!user) {
+      throw new Error('No authenticated user');
+    }
+    
+    const updatedProfile = await authService.updateProfile(user.uid, updateData);
+    setUserProfile(updatedProfile);
+  };
+
+  const changePassword = async (currentPassword: string, newPassword: string) => {
+    await authService.changePassword(currentPassword, newPassword);
+  };
+
+  const refreshProfile = async () => {
+    if (!user) return;
+    
+    const profile = await authService.getUserProfile(user.uid);
+    setUserProfile(profile);
+  };
+
   const value = {
     user,
     userProfile,
     loading,
     login,
     register,
-    logout
+    logout,
+    updateProfile,
+    changePassword,
+    refreshProfile
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

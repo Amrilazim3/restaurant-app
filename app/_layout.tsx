@@ -8,6 +8,7 @@ import 'react-native-reanimated';
 
 import { useColorScheme } from '@/components/useColorScheme';
 import { AuthProvider } from '@/contexts/AuthContext';
+import { CartProvider } from '@/contexts/CartContext';
 
 export {
   // Catch any errors thrown by the Layout component.
@@ -45,7 +46,9 @@ export default function RootLayout() {
 
   return (
     <AuthProvider>
-      <RootLayoutNav />
+      <CartProvider>
+        <RootLayoutNav />
+      </CartProvider>
     </AuthProvider>
   );
 }
@@ -59,6 +62,30 @@ function RootLayoutNav() {
         <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
         <Stack.Screen name="(auth)" options={{ headerShown: false }} />
         <Stack.Screen name="modal" options={{ presentation: 'modal' }} />
+        <Stack.Screen 
+          name="editProfile" 
+          options={{ 
+            title: 'Edit Profile',
+            headerShown: true,
+            presentation: 'modal'
+          }} 
+        />
+        <Stack.Screen 
+          name="changePassword" 
+          options={{ 
+            title: 'Change Password',
+            headerShown: true,
+            presentation: 'modal'
+          }} 
+        />
+        <Stack.Screen 
+          name="foodDetail" 
+          options={{ 
+            title: 'Food Details',
+            headerShown: true,
+            presentation: 'card'
+          }} 
+        />
       </Stack>
     </ThemeProvider>
   );

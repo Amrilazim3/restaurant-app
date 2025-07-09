@@ -2,9 +2,12 @@ import {
   createUserWithEmailAndPassword, 
   signInWithEmailAndPassword, 
   signOut, 
-  User 
+  User,
+  updatePassword,
+  EmailAuthProvider,
+  reauthenticateWithCredential
 } from 'firebase/auth';
-import { doc, setDoc, getDoc } from 'firebase/firestore';
+import { doc, setDoc, getDoc, updateDoc } from 'firebase/firestore';
 import { auth, db } from './firebase';
 
 export interface UserProfile {
@@ -15,6 +18,13 @@ export interface UserProfile {
   phoneNumber?: string;
   address?: string;
   createdAt: Date;
+  updatedAt?: Date;
+}
+
+export interface ProfileUpdateData {
+  displayName?: string;
+  phoneNumber?: string;
+  address?: string;
 }
 
 export const authService = {
@@ -90,6 +100,47 @@ export const authService = {
     } catch (error) {
       console.error('Error getting user profile:', error);
       return null;
+    }
+  },
+
+  // Update user profile
+  async updateProfile(uid: string, updateData: ProfileUpdateData): Promise<UserProfile> {
+    try {
+      const updatedData = {
+        ...updateData,
+        updatedAt: new Date()
+      };
+      
+      await updateDoc(doc(db, 'users', uid), updatedData);
+      
+      // Get updated profile
+      const updatedProfile = await this.getUserProfile(uid);
+      if (!updatedProfile) {
+        throw new Error('Failed to retrieve updated profile');
+      }
+      
+      return updatedProfile;
+    } catch (error) {
+      throw error;
+    }
+  },
+
+  // Change password
+  async changePassword(currentPassword: string, newPassword: string): Promise<void> {
+    try {
+      const user = auth.currentUser;
+      if (!user || !user.email) {
+        throw new Error('No authenticated user found');
+      }
+
+      // Re-authenticate user
+      const credential = EmailAuthProvider.credential(user.email, currentPassword);
+      await reauthenticateWithCredential(user, credential);
+
+      // Update password
+      await updatePassword(user, newPassword);
+    } catch (error) {
+      throw error;
     }
   }
 }; 

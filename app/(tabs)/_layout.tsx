@@ -1,12 +1,14 @@
+import { Tabs } from 'expo-router';
 import React, { useEffect } from 'react';
+import { View, Text, StyleSheet, ActivityIndicator } from 'react-native';
+import { router } from 'expo-router';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
-import { Link, Tabs, router } from 'expo-router';
-import { Pressable, ActivityIndicator, View } from 'react-native';
 
 import Colors from '@/constants/Colors';
 import { useColorScheme } from '@/components/useColorScheme';
 import { useClientOnlyValue } from '@/components/useClientOnlyValue';
 import { useAuth } from '@/contexts/AuthContext';
+import { useCart } from '@/contexts/CartContext';
 
 // You can explore the built-in icon families and icons on the web at https://icons.expo.fyi/
 function TabBarIcon(props: {
@@ -16,9 +18,23 @@ function TabBarIcon(props: {
   return <FontAwesome size={28} style={{ marginBottom: -3 }} {...props} />;
 }
 
+// Cart Badge Component
+const CartBadge = ({ count }: { count: number }) => {
+  if (count === 0) return null;
+  
+  return (
+    <View style={styles.badge}>
+      <Text style={styles.badgeText}>
+        {count > 99 ? '99+' : count.toString()}
+      </Text>
+    </View>
+  );
+};
+
 export default function TabLayout() {
   const colorScheme = useColorScheme();
   const { user, loading } = useAuth();
+  const { cartCount } = useCart();
 
   useEffect(() => {
     if (!loading && !user) {
@@ -64,7 +80,12 @@ export default function TabLayout() {
         name="cart"
         options={{
           title: 'Cart',
-          tabBarIcon: ({ color }) => <TabBarIcon name="shopping-cart" color={color} />,
+          tabBarIcon: ({ color }) => (
+            <View style={styles.cartIconContainer}>
+              <TabBarIcon name="shopping-cart" color={color} />
+              <CartBadge count={cartCount} />
+            </View>
+          ),
         }}
       />
       <Tabs.Screen
@@ -84,3 +105,27 @@ export default function TabLayout() {
     </Tabs>
   );
 }
+
+const styles = StyleSheet.create({
+  cartIconContainer: {
+    position: 'relative',
+  },
+  badge: {
+    position: 'absolute',
+    top: -8,
+    right: -8,
+    backgroundColor: '#FF3B30',
+    borderRadius: 10,
+    minWidth: 20,
+    height: 20,
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingHorizontal: 6,
+  },
+  badgeText: {
+    color: 'white',
+    fontSize: 12,
+    fontWeight: 'bold',
+    textAlign: 'center',
+  },
+});
