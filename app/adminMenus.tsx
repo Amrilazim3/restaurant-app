@@ -68,7 +68,7 @@ export default function AdminMenusScreen() {
       setMenus(menusWithStats);
     } catch (error) {
       console.error('Error loading menus:', error);
-      Alert.alert('Error', 'Failed to load menus. Please try again.');
+      Alert.alert('Ralat', 'Gagal memuatkan menu. Sila cuba lagi.');
     } finally {
       setLoading(false);
     }
@@ -111,21 +111,21 @@ export default function AdminMenusScreen() {
 
   const handleDeleteMenu = (menu: Menu) => {
     Alert.alert(
-      'Delete Menu',
-      `Are you sure you want to delete "${menu.name}"? This will hide the menu from customers but preserve the data.`,
+      'Padam Menu',
+      `Adakah anda pasti mahu memadamkan "${menu.name}"? Ini akan menyembunyikan menu dari pelanggan tetapi mengekalkan data.`,
       [
-        { text: 'Cancel', style: 'cancel' },
+        { text: 'Batal', style: 'cancel' },
         {
-          text: 'Delete',
+          text: 'Padam',
           style: 'destructive',
           onPress: async () => {
             try {
               await menuService.deleteMenu(menu.id);
-              Alert.alert('Success', 'Menu deleted successfully');
+              Alert.alert('Berjaya', 'Menu berjaya dipadamkan');
               loadMenus();
             } catch (error) {
               console.error('Error deleting menu:', error);
-              Alert.alert('Error', 'Failed to delete menu. Please try again.');
+              Alert.alert('Ralat', 'Gagal memadamkan menu. Sila cuba lagi.');
             }
           },
         },
@@ -143,9 +143,9 @@ export default function AdminMenusScreen() {
 
   const showMenuOptions = (menu: Menu) => {
     const options = [
-      'Edit Menu',
-      'Delete Menu',
-      'Cancel'
+      'Sunting Menu',
+      'Padam Menu',
+      'Batal'
     ];
 
     if (Platform.OS === 'ios') {
@@ -167,10 +167,10 @@ export default function AdminMenusScreen() {
         }
       );
     } else {
-      Alert.alert('Menu Options', 'Choose an action:', [
-        { text: 'Edit Menu', onPress: () => handleEditMenu(menu) },
-        { text: 'Delete Menu', style: 'destructive', onPress: () => handleDeleteMenu(menu) },
-        { text: 'Cancel', style: 'cancel' },
+      Alert.alert('Pilihan Menu', 'Pilih tindakan:', [
+        { text: 'Sunting Menu', onPress: () => handleEditMenu(menu) },
+        { text: 'Padam Menu', style: 'destructive', onPress: () => handleDeleteMenu(menu) },
+        { text: 'Batal', style: 'cancel' },
       ]);
     }
   };
@@ -258,15 +258,15 @@ export default function AdminMenusScreen() {
         <View style={styles.statsContainer}>
           <View style={styles.statItem}>
             <Text style={styles.statNumber}>{menu.stats.totalFoods}</Text>
-            <Text style={styles.statLabel}>Total Foods</Text>
+            <Text style={styles.statLabel}>Jumlah Makanan</Text>
           </View>
           <View style={styles.statItem}>
             <Text style={styles.statNumber}>{menu.stats.activeFoods}</Text>
-            <Text style={styles.statLabel}>Active</Text>
+            <Text style={styles.statLabel}>Aktif</Text>
           </View>
           <View style={styles.statItem}>
             <Text style={styles.statNumber}>{menu.stats.availableFoods}</Text>
-            <Text style={styles.statLabel}>Available</Text>
+            <Text style={styles.statLabel}>Tersedia</Text>
           </View>
         </View>
       )}
@@ -274,11 +274,11 @@ export default function AdminMenusScreen() {
       <View style={styles.menuFooter}>
         <View style={styles.statusContainer}>
           <View style={[styles.statusIndicator, { backgroundColor: menu.isActive ? '#28a745' : '#dc3545' }]} />
-          <Text style={styles.statusText}>{menu.isActive ? 'Active' : 'Inactive'}</Text>
+          <Text style={styles.statusText}>{menu.isActive ? 'Aktif' : 'Tidak Aktif'}</Text>
         </View>
         
         <Text style={styles.updatedText}>
-          Updated: {menu.updatedAt ? menu.updatedAt.toLocaleDateString() : menu.createdAt.toLocaleDateString()}
+          Dikemas kini: {menu.updatedAt ? menu.updatedAt.toLocaleDateString() : menu.createdAt.toLocaleDateString()}
         </Text>
       </View>
     </TouchableOpacity>
@@ -288,7 +288,7 @@ export default function AdminMenusScreen() {
     return (
       <View style={styles.loadingContainer}>
         <ActivityIndicator size="large" color="#007AFF" />
-        <Text style={styles.loadingText}>Loading menus...</Text>
+        <Text style={styles.loadingText}>Memuatkan menu...</Text>
       </View>
     );
   }
@@ -300,7 +300,7 @@ export default function AdminMenusScreen() {
         <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
           <Ionicons name="arrow-back" size={24} color="#007AFF" />
         </TouchableOpacity>
-        <Text style={styles.title}>Menu Management</Text>
+        <Text style={styles.title}>Pengurusan Menu</Text>
         <TouchableOpacity onPress={handleCreateMenu} style={styles.addButton}>
           <Ionicons name="add" size={24} color="#007AFF" />
         </TouchableOpacity>
@@ -312,7 +312,7 @@ export default function AdminMenusScreen() {
           <Ionicons name="search" size={20} color="#666" />
           <TextInput
             style={styles.searchInput}
-            placeholder="Search menus..."
+            placeholder="Cari menu..."
             value={searchQuery}
             onChangeText={setSearchQuery}
           />
@@ -320,7 +320,7 @@ export default function AdminMenusScreen() {
         
         <View style={styles.filterContainer}>
           <View style={styles.filterItem}>
-            <Text style={styles.filterLabel}>Show Inactive</Text>
+            <Text style={styles.filterLabel}>Tunjuk Tidak Aktif</Text>
             <Switch
               value={showInactive}
               onValueChange={setShowInactive}
@@ -336,7 +336,7 @@ export default function AdminMenusScreen() {
             }}
           >
             <Text style={styles.bulkButtonText}>
-              {bulkMode ? 'Cancel' : 'Bulk Edit'}
+              {bulkMode ? 'Batal' : 'Edit Pukal'}
             </Text>
           </TouchableOpacity>
         </View>
@@ -346,26 +346,26 @@ export default function AdminMenusScreen() {
       {bulkMode && (
         <View style={styles.bulkActions}>
           <Text style={styles.bulkTitle}>
-            {selectedMenus.length} menu(s) selected
+            {selectedMenus.length} menu dipilih
           </Text>
           <View style={styles.bulkButtons}>
             <TouchableOpacity
               style={[styles.bulkActionButton, styles.activateButton]}
               onPress={() => handleBulkAction('activate')}
             >
-              <Text style={styles.bulkActionText}>Activate</Text>
+              <Text style={styles.bulkActionText}>Aktifkan</Text>
             </TouchableOpacity>
             <TouchableOpacity
               style={[styles.bulkActionButton, styles.deactivateButton]}
               onPress={() => handleBulkAction('deactivate')}
             >
-              <Text style={styles.bulkActionText}>Deactivate</Text>
+              <Text style={styles.bulkActionText}>Nyahaktifkan</Text>
             </TouchableOpacity>
             <TouchableOpacity
               style={[styles.bulkActionButton, styles.deleteButton]}
               onPress={() => handleBulkAction('delete')}
             >
-              <Text style={styles.bulkActionText}>Delete</Text>
+              <Text style={styles.bulkActionText}>Padam</Text>
             </TouchableOpacity>
           </View>
         </View>
@@ -382,10 +382,10 @@ export default function AdminMenusScreen() {
           <View style={styles.emptyContainer}>
             <Ionicons name="restaurant" size={64} color="#ccc" />
             <Text style={styles.emptyText}>
-              {searchQuery ? 'No menus found matching your search' : 'No menus available'}
+              {searchQuery ? 'Tiada menu dijumpai mengikut carian anda' : 'Tiada menu tersedia'}
             </Text>
             <TouchableOpacity style={styles.emptyButton} onPress={handleCreateMenu}>
-              <Text style={styles.emptyButtonText}>Create First Menu</Text>
+              <Text style={styles.emptyButtonText}>Cipta Menu Pertama</Text>
             </TouchableOpacity>
           </View>
         ) : (

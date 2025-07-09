@@ -68,7 +68,7 @@ export default function AdminFoodsScreen() {
       setFoods(foodsData);
     } catch (error) {
       console.error('Error loading data:', error);
-      Alert.alert('Error', 'Failed to load data. Please try again.');
+      Alert.alert('Ralat', 'Gagal memuatkan data. Sila cuba lagi.');
     } finally {
       setLoading(false);
     }
@@ -142,7 +142,7 @@ export default function AdminFoodsScreen() {
       setFoods(foodsData);
     } catch (error) {
       console.error('Error loading foods by menu:', error);
-      Alert.alert('Error', 'Failed to load foods. Please try again.');
+      Alert.alert('Ralat', 'Gagal memuatkan makanan. Sila cuba lagi.');
     }
   };
 
@@ -161,21 +161,21 @@ export default function AdminFoodsScreen() {
 
   const handleDeleteFood = (food: Food) => {
     Alert.alert(
-      'Delete Food',
-      `Are you sure you want to delete "${food.name}"? This will hide the food from customers but preserve the data.`,
+      'Padam Makanan',
+      `Adakah anda pasti mahu memadamkan "${food.name}"? Ini akan menyembunyikan makanan dari pelanggan tetapi mengekalkan data.`,
       [
-        { text: 'Cancel', style: 'cancel' },
+        { text: 'Batal', style: 'cancel' },
         {
-          text: 'Delete',
+          text: 'Padam',
           style: 'destructive',
           onPress: async () => {
             try {
               await menuService.deleteFood(food.id);
-              Alert.alert('Success', 'Food deleted successfully');
+              Alert.alert('Berjaya', 'Makanan berjaya dipadamkan');
               loadData();
             } catch (error) {
               console.error('Error deleting food:', error);
-              Alert.alert('Error', 'Failed to delete food. Please try again.');
+              Alert.alert('Ralat', 'Gagal memadamkan makanan. Sila cuba lagi.');
             }
           },
         },
@@ -193,9 +193,9 @@ export default function AdminFoodsScreen() {
 
   const showFoodOptions = (food: Food) => {
     const options = [
-      'Edit Food',
-      'Delete Food',
-      'Cancel'
+      'Sunting Makanan',
+      'Padam Makanan',
+      'Batal'
     ];
 
     if (Platform.OS === 'ios') {
@@ -217,10 +217,10 @@ export default function AdminFoodsScreen() {
         }
       );
     } else {
-      Alert.alert('Food Options', 'Choose an action:', [
-        { text: 'Edit Food', onPress: () => handleEditFood(food) },
-        { text: 'Delete Food', style: 'destructive', onPress: () => handleDeleteFood(food) },
-        { text: 'Cancel', style: 'cancel' },
+      Alert.alert('Pilihan Makanan', 'Pilih tindakan:', [
+        { text: 'Sunting Makanan', onPress: () => handleEditFood(food) },
+        { text: 'Padam Makanan', style: 'destructive', onPress: () => handleDeleteFood(food) },
+        { text: 'Batal', style: 'cancel' },
       ]);
     }
   };
@@ -235,24 +235,24 @@ export default function AdminFoodsScreen() {
 
   const handleBulkAction = (action: 'activate' | 'deactivate' | 'available' | 'unavailable' | 'delete') => {
     if (selectedFoods.length === 0) {
-      Alert.alert('No Selection', 'Please select foods to perform bulk actions.');
+      Alert.alert('Tiada Pilihan', 'Sila pilih makanan untuk melakukan tindakan pukal.');
       return;
     }
 
-    const actionText = action === 'activate' ? 'activate' : 
-                     action === 'deactivate' ? 'deactivate' :
-                     action === 'available' ? 'mark as available' :
-                     action === 'unavailable' ? 'mark as unavailable' : 'delete';
+    const actionText = action === 'activate' ? 'aktifkan' : 
+                     action === 'deactivate' ? 'nyahaktifkan' :
+                     action === 'available' ? 'tandakan sebagai tersedia' :
+                     action === 'unavailable' ? 'tandakan sebagai tidak tersedia' : 'padamkan';
     
     const selectedCount = selectedFoods.length;
 
     Alert.alert(
-      `Bulk ${action.charAt(0).toUpperCase() + action.slice(1)}`,
-      `Are you sure you want to ${actionText} ${selectedCount} food(s)?`,
+      `Tindakan Pukal ${action === 'activate' ? 'Aktifkan' : action === 'deactivate' ? 'Nyahaktifkan' : action === 'available' ? 'Tersedia' : action === 'unavailable' ? 'Tidak Tersedia' : 'Padam'}`,
+      `Adakah anda pasti mahu ${actionText} ${selectedCount} makanan?`,
       [
-        { text: 'Cancel', style: 'cancel' },
+        { text: 'Batal', style: 'cancel' },
         {
-          text: action.charAt(0).toUpperCase() + action.slice(1),
+          text: action === 'activate' ? 'Aktifkan' : action === 'deactivate' ? 'Nyahaktifkan' : action === 'available' ? 'Tersedia' : action === 'unavailable' ? 'Tidak Tersedia' : 'Padam',
           style: action === 'delete' ? 'destructive' : 'default',
           onPress: async () => {
             try {
@@ -264,13 +264,13 @@ export default function AdminFoodsScreen() {
                 await menuService.bulkUpdateFoodAvailability(selectedFoods, action === 'available');
               }
               
-              Alert.alert('Success', `${selectedCount} food(s) ${actionText}d successfully`);
+              Alert.alert('Berjaya', `${selectedCount} makanan berjaya ${actionText}`);
               setSelectedFoods([]);
               setBulkMode(false);
               loadData();
             } catch (error) {
               console.error(`Error performing bulk ${action}:`, error);
-              Alert.alert('Error', `Failed to ${actionText} foods. Please try again.`);
+              Alert.alert('Ralat', `Gagal ${actionText} makanan. Sila cuba lagi.`);
             }
           },
         },
@@ -333,7 +333,7 @@ export default function AdminFoodsScreen() {
               { backgroundColor: food.isActive ? '#28a745' : '#dc3545' }
             ]} />
             <Text style={styles.statusText}>
-              {food.isActive ? 'Active' : 'Inactive'}
+              {food.isActive ? 'Aktif' : 'Tidak Aktif'}
             </Text>
             
             <View style={[
@@ -341,12 +341,12 @@ export default function AdminFoodsScreen() {
               { backgroundColor: food.isAvailable ? '#007AFF' : '#ffc107', marginLeft: 12 }
             ]} />
             <Text style={styles.statusText}>
-              {food.isAvailable ? 'Available' : 'Unavailable'}
+              {food.isAvailable ? 'Tersedia' : 'Tidak Tersedia'}
             </Text>
           </View>
           
           <Text style={styles.updatedText}>
-            Updated: {food.updatedAt ? food.updatedAt.toLocaleDateString() : food.createdAt.toLocaleDateString()}
+            Dikemas kini: {food.updatedAt ? food.updatedAt.toLocaleDateString() : food.createdAt.toLocaleDateString()}
           </Text>
         </View>
       </TouchableOpacity>
@@ -357,7 +357,7 @@ export default function AdminFoodsScreen() {
     return (
       <View style={styles.loadingContainer}>
         <ActivityIndicator size="large" color="#007AFF" />
-        <Text style={styles.loadingText}>Loading foods...</Text>
+        <Text style={styles.loadingText}>Memuatkan makanan...</Text>
       </View>
     );
   }
@@ -370,7 +370,7 @@ export default function AdminFoodsScreen() {
           <Ionicons name="arrow-back" size={24} color="#007AFF" />
         </TouchableOpacity>
         <Text style={styles.title}>
-          {currentMenu ? `${currentMenu.name} Foods` : 'Food Management'}
+          {currentMenu ? `Makanan ${currentMenu.name}` : 'Pengurusan Makanan'}
         </Text>
         <TouchableOpacity onPress={handleCreateFood} style={styles.addButton}>
           <Ionicons name="add" size={24} color="#007AFF" />
@@ -383,7 +383,7 @@ export default function AdminFoodsScreen() {
           <Ionicons name="search" size={20} color="#666" />
           <TextInput
             style={styles.searchInput}
-            placeholder="Search foods..."
+            placeholder="Cari makanan..."
             value={searchQuery}
             onChangeText={setSearchQuery}
           />
@@ -396,7 +396,7 @@ export default function AdminFoodsScreen() {
             onPress={() => handleMenuChange('')}
           >
             <Text style={[styles.menuFilterText, !selectedMenuId && styles.menuFilterTextActive]}>
-              All Foods
+              Semua Makanan
             </Text>
           </TouchableOpacity>
           {menus.map(menu => (
@@ -415,7 +415,7 @@ export default function AdminFoodsScreen() {
         <View style={styles.filterContainer}>
           <View style={styles.filterRow}>
             <View style={styles.filterItem}>
-              <Text style={styles.filterLabel}>Inactive</Text>
+              <Text style={styles.filterLabel}>Tidak Aktif</Text>
               <Switch
                 value={showInactive}
                 onValueChange={setShowInactive}
@@ -424,7 +424,7 @@ export default function AdminFoodsScreen() {
             </View>
             
             <View style={styles.filterItem}>
-              <Text style={styles.filterLabel}>Unavailable</Text>
+              <Text style={styles.filterLabel}>Tidak Tersedia</Text>
               <Switch
                 value={showUnavailable}
                 onValueChange={setShowUnavailable}
@@ -442,7 +442,7 @@ export default function AdminFoodsScreen() {
               }}
             >
               <Text style={styles.sortButtonText}>
-                Sort: {sortBy === 'name' ? 'Name' : sortBy === 'price' ? 'Price' : 'Updated'}
+                Susun: {sortBy === 'name' ? 'Nama' : sortBy === 'price' ? 'Harga' : 'Dikemas kini'}
               </Text>
               <Ionicons name="swap-vertical" size={16} color="#007AFF" />
             </TouchableOpacity>
@@ -455,7 +455,7 @@ export default function AdminFoodsScreen() {
               }}
             >
               <Text style={styles.bulkButtonText}>
-                {bulkMode ? 'Cancel' : 'Bulk Edit'}
+                {bulkMode ? 'Batal' : 'Edit Pukal'}
               </Text>
             </TouchableOpacity>
           </View>
@@ -466,7 +466,7 @@ export default function AdminFoodsScreen() {
       {bulkMode && (
         <View style={styles.bulkActions}>
           <Text style={styles.bulkTitle}>
-            {selectedFoods.length} food(s) selected
+            {selectedFoods.length} makanan dipilih
           </Text>
           <ScrollView horizontal showsHorizontalScrollIndicator={false}>
             <View style={styles.bulkButtons}>
@@ -474,31 +474,31 @@ export default function AdminFoodsScreen() {
                 style={[styles.bulkActionButton, styles.activateButton]}
                 onPress={() => handleBulkAction('activate')}
               >
-                <Text style={styles.bulkActionText}>Activate</Text>
+                <Text style={styles.bulkActionText}>Aktifkan</Text>
               </TouchableOpacity>
               <TouchableOpacity
                 style={[styles.bulkActionButton, styles.deactivateButton]}
                 onPress={() => handleBulkAction('deactivate')}
               >
-                <Text style={styles.bulkActionText}>Deactivate</Text>
+                <Text style={styles.bulkActionText}>Nyahaktifkan</Text>
               </TouchableOpacity>
               <TouchableOpacity
                 style={[styles.bulkActionButton, styles.availableButton]}
                 onPress={() => handleBulkAction('available')}
               >
-                <Text style={styles.bulkActionText}>Available</Text>
+                <Text style={styles.bulkActionText}>Tersedia</Text>
               </TouchableOpacity>
               <TouchableOpacity
                 style={[styles.bulkActionButton, styles.unavailableButton]}
                 onPress={() => handleBulkAction('unavailable')}
               >
-                <Text style={styles.bulkActionText}>Unavailable</Text>
+                <Text style={styles.bulkActionText}>Tidak Tersedia</Text>
               </TouchableOpacity>
               <TouchableOpacity
                 style={[styles.bulkActionButton, styles.deleteButton]}
                 onPress={() => handleBulkAction('delete')}
               >
-                <Text style={styles.bulkActionText}>Delete</Text>
+                <Text style={styles.bulkActionText}>Padam</Text>
               </TouchableOpacity>
             </View>
           </ScrollView>
@@ -516,10 +516,10 @@ export default function AdminFoodsScreen() {
           <View style={styles.emptyContainer}>
             <Ionicons name="restaurant" size={64} color="#ccc" />
             <Text style={styles.emptyText}>
-              {searchQuery ? 'No foods found matching your search' : 'No foods available'}
+              {searchQuery ? 'Tiada makanan dijumpai mengikut carian anda' : 'Tiada makanan tersedia'}
             </Text>
             <TouchableOpacity style={styles.emptyButton} onPress={handleCreateFood}>
-              <Text style={styles.emptyButtonText}>Add First Food</Text>
+              <Text style={styles.emptyButtonText}>Tambah Makanan Pertama</Text>
             </TouchableOpacity>
           </View>
         ) : (

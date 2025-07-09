@@ -11,15 +11,15 @@ export default function ProfileScreen() {
 
   const handleLogout = () => {
     Alert.alert(
-      'Logout',
-      'Are you sure you want to logout?',
+      'Log Keluar',
+      'Adakah anda pasti mahu log keluar?',
       [
         {
-          text: 'Cancel',
+          text: 'Batal',
           style: 'cancel',
         },
         {
-          text: 'Logout',
+          text: 'Log Keluar',
           style: 'destructive',
           onPress: async () => {
             try {
@@ -51,58 +51,58 @@ export default function ProfileScreen() {
         router.push('/adminFoods');
         break;
       case 'View Orders':
-        Alert.alert('Admin Action', 'Order management feature coming soon!');
+        Alert.alert('Tindakan Admin', 'Fungsi pengurusan pesanan akan datang tidak lama lagi!');
         break;
       case 'User Management':
-        Alert.alert('Admin Action', 'User management feature coming soon!');
+        Alert.alert('Tindakan Admin', 'Fungsi pengurusan pengguna akan datang tidak lama lagi!');
         break;
       case 'Analytics':
-        Alert.alert('Admin Action', 'Analytics feature coming soon!');
+        Alert.alert('Tindakan Admin', 'Fungsi analitik akan datang tidak lama lagi!');
         break;
       default:
-        Alert.alert('Admin Action', `${action} feature coming soon!`);
+        Alert.alert('Tindakan Admin', `Fungsi ${action} akan datang tidak lama lagi!`);
     }
   };
 
   return (
     <ScrollView style={styles.container}>
       <View style={styles.header}>
-        <Text style={styles.title}>Profile</Text>
-        <Text style={styles.subtitle}>Manage your account</Text>
+        <Text style={styles.title}>Profil</Text>
+        <Text style={styles.subtitle}>Urus akaun anda</Text>
       </View>
 
       <View style={styles.profileSection}>
         <View style={styles.profileItem}>
-          <Text style={styles.profileLabel}>Name</Text>
-          <Text style={styles.profileValue}>{userProfile?.displayName || 'Not set'}</Text>
+          <Text style={styles.profileLabel}>Nama</Text>
+          <Text style={styles.profileValue}>{userProfile?.displayName || 'Tidak ditetapkan'}</Text>
         </View>
 
         <View style={styles.profileItem}>
-          <Text style={styles.profileLabel}>Email</Text>
+          <Text style={styles.profileLabel}>E-mel</Text>
           <Text style={styles.profileValue}>{userProfile?.email}</Text>
         </View>
 
         <View style={styles.profileItem}>
-          <Text style={styles.profileLabel}>Phone</Text>
-          <Text style={styles.profileValue}>{userProfile?.phoneNumber || 'Not set'}</Text>
+          <Text style={styles.profileLabel}>Telefon</Text>
+          <Text style={styles.profileValue}>{userProfile?.phoneNumber || 'Tidak ditetapkan'}</Text>
         </View>
 
         <View style={styles.profileItem}>
-          <Text style={styles.profileLabel}>Address</Text>
-          <Text style={styles.profileValue}>{userProfile?.address || 'Not set'}</Text>
+          <Text style={styles.profileLabel}>Alamat</Text>
+          <Text style={styles.profileValue}>{userProfile?.address || 'Tidak ditetapkan'}</Text>
         </View>
 
         <View style={styles.profileItem}>
-          <Text style={styles.profileLabel}>Role</Text>
+          <Text style={styles.profileLabel}>Peranan</Text>
           <Text style={[styles.profileValue, styles.roleValue]}>
-            {userProfile?.role === 'admin' ? 'Administrator' : 'User'}
+            {userProfile?.role === 'admin' ? 'Pentadbir' : 'Pengguna'}
           </Text>
         </View>
 
         {cartCount > 0 && (
           <View style={styles.profileItem}>
-            <Text style={styles.profileLabel}>Cart</Text>
-            <Text style={styles.profileValue}>{cartCount} items</Text>
+            <Text style={styles.profileLabel}>Troli</Text>
+            <Text style={styles.profileValue}>{cartCount} item</Text>
           </View>
         )}
       </View>
@@ -110,57 +110,57 @@ export default function ProfileScreen() {
       {/* Admin Panel */}
       {userProfile?.role === 'admin' && (
         <View style={styles.adminSection}>
-          <Text style={styles.adminTitle}>Admin Panel</Text>
-          <Text style={styles.adminSubtitle}>Administrative functions</Text>
+          <Text style={styles.adminTitle}>Panel Admin</Text>
+          <Text style={styles.adminSubtitle}>Fungsi pentadbiran</Text>
           
           <TouchableOpacity 
             style={styles.adminButton}
             onPress={() => handleAdminAction('Manage Menus')}
           >
-            <Text style={styles.adminButtonText}>Manage Menus</Text>
+            <Text style={styles.adminButtonText}>Urus Menu</Text>
           </TouchableOpacity>
 
           <TouchableOpacity 
             style={styles.adminButton}
             onPress={() => handleAdminAction('Manage Foods')}
           >
-            <Text style={styles.adminButtonText}>Manage Foods</Text>
+            <Text style={styles.adminButtonText}>Urus Makanan</Text>
           </TouchableOpacity>
 
           <TouchableOpacity 
             style={styles.adminButton}
             onPress={() => handleAdminAction('View Orders')}
           >
-            <Text style={styles.adminButtonText}>View All Orders</Text>
+            <Text style={styles.adminButtonText}>Lihat Semua Pesanan</Text>
           </TouchableOpacity>
 
           <TouchableOpacity 
             style={styles.adminButton}
             onPress={() => handleAdminAction('User Management')}
           >
-            <Text style={styles.adminButtonText}>User Management</Text>
+            <Text style={styles.adminButtonText}>Pengurusan Pengguna</Text>
           </TouchableOpacity>
 
           <TouchableOpacity 
             style={styles.adminButton}
             onPress={() => handleAdminAction('Analytics')}
           >
-            <Text style={styles.adminButtonText}>Analytics & Reports</Text>
+            <Text style={styles.adminButtonText}>Analitik & Laporan</Text>
           </TouchableOpacity>
         </View>
       )}
 
       <View style={styles.actionsSection}>
         <TouchableOpacity style={styles.actionButton} onPress={handleEditProfile}>
-          <Text style={styles.actionButtonText}>Edit Profile</Text>
+          <Text style={styles.actionButtonText}>Sunting Profil</Text>
         </TouchableOpacity>
 
         <TouchableOpacity style={styles.actionButton} onPress={handleChangePassword}>
-          <Text style={styles.actionButtonText}>Change Password</Text>
+          <Text style={styles.actionButtonText}>Tukar Kata Laluan</Text>
         </TouchableOpacity>
 
         <TouchableOpacity style={styles.actionButton}>
-          <Text style={styles.actionButtonText}>Order History</Text>
+          <Text style={styles.actionButtonText}>Sejarah Pesanan</Text>
         </TouchableOpacity>
 
         {cartCount > 0 && (
@@ -169,17 +169,17 @@ export default function ProfileScreen() {
             onPress={clearCart}
           >
             <Text style={[styles.actionButtonText, styles.clearCartButtonText]}>
-              Clear Cart ({cartCount})
+              Kosongkan Troli ({cartCount})
             </Text>
           </TouchableOpacity>
         )}
 
         <TouchableOpacity style={styles.actionButton}>
-          <Text style={styles.actionButtonText}>Settings</Text>
+          <Text style={styles.actionButtonText}>Tetapan</Text>
         </TouchableOpacity>
 
         <TouchableOpacity style={[styles.actionButton, styles.logoutButton]} onPress={handleLogout}>
-          <Text style={[styles.actionButtonText, styles.logoutButtonText]}>Logout</Text>
+          <Text style={[styles.actionButtonText, styles.logoutButtonText]}>Log Keluar</Text>
         </TouchableOpacity>
       </View>
     </ScrollView>

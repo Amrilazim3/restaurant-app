@@ -24,41 +24,41 @@ export default function ChangePasswordScreen() {
 
   const handleChangePassword = async () => {
     if (!currentPassword || !newPassword || !confirmPassword) {
-      Alert.alert('Error', 'Please fill in all fields');
+      Alert.alert('Ralat', 'Sila isi semua medan');
       return;
     }
 
     if (newPassword !== confirmPassword) {
-      Alert.alert('Error', 'New passwords do not match');
+      Alert.alert('Ralat', 'Kata laluan baharu tidak sepadan');
       return;
     }
 
     if (newPassword.length < 6) {
-      Alert.alert('Error', 'New password must be at least 6 characters');
+      Alert.alert('Ralat', 'Kata laluan baharu mesti sekurang-kurangnya 6 aksara');
       return;
     }
 
     if (currentPassword === newPassword) {
-      Alert.alert('Error', 'New password must be different from current password');
+      Alert.alert('Ralat', 'Kata laluan baharu mesti berbeza dari kata laluan semasa');
       return;
     }
 
     setLoading(true);
     try {
       await changePassword(currentPassword, newPassword);
-      Alert.alert('Success', 'Password changed successfully!', [
+      Alert.alert('Berjaya', 'Kata laluan berjaya ditukar!', [
         { text: 'OK', onPress: () => router.back() }
       ]);
     } catch (error: any) {
-      let errorMessage = 'Failed to change password';
+      let errorMessage = 'Gagal menukar kata laluan';
       
       if (error.code === 'auth/wrong-password') {
-        errorMessage = 'Current password is incorrect';
+        errorMessage = 'Kata laluan semasa tidak betul';
       } else if (error.code === 'auth/weak-password') {
-        errorMessage = 'New password is too weak';
+        errorMessage = 'Kata laluan baharu terlalu lemah';
       }
       
-      Alert.alert('Error', errorMessage);
+      Alert.alert('Ralat', errorMessage);
     } finally {
       setLoading(false);
     }
@@ -71,15 +71,15 @@ export default function ChangePasswordScreen() {
     >
       <ScrollView contentContainerStyle={styles.scrollContainer}>
         <View style={styles.content}>
-          <Text style={styles.title}>Change Password</Text>
-          <Text style={styles.subtitle}>Update your account password</Text>
+          <Text style={styles.title}>Tukar Kata Laluan</Text>
+          <Text style={styles.subtitle}>Kemas kini kata laluan akaun anda</Text>
 
           <View style={styles.form}>
             <View style={styles.inputGroup}>
-              <Text style={styles.label}>Current Password *</Text>
+              <Text style={styles.label}>Kata Laluan Semasa *</Text>
               <TextInput
                 style={styles.input}
-                placeholder="Enter your current password"
+                placeholder="Masukkan kata laluan semasa anda"
                 value={currentPassword}
                 onChangeText={setCurrentPassword}
                 secureTextEntry
@@ -89,10 +89,10 @@ export default function ChangePasswordScreen() {
             </View>
 
             <View style={styles.inputGroup}>
-              <Text style={styles.label}>New Password *</Text>
+              <Text style={styles.label}>Kata Laluan Baharu *</Text>
               <TextInput
                 style={styles.input}
-                placeholder="Enter new password (min 6 characters)"
+                placeholder="Masukkan kata laluan baharu (min 6 aksara)"
                 value={newPassword}
                 onChangeText={setNewPassword}
                 secureTextEntry
@@ -102,10 +102,10 @@ export default function ChangePasswordScreen() {
             </View>
 
             <View style={styles.inputGroup}>
-              <Text style={styles.label}>Confirm New Password *</Text>
+              <Text style={styles.label}>Sahkan Kata Laluan Baharu *</Text>
               <TextInput
                 style={styles.input}
-                placeholder="Confirm new password"
+                placeholder="Sahkan kata laluan baharu"
                 value={confirmPassword}
                 onChangeText={setConfirmPassword}
                 secureTextEntry
@@ -119,7 +119,7 @@ export default function ChangePasswordScreen() {
                 style={[styles.button, styles.cancelButton]}
                 onPress={() => router.back()}
               >
-                <Text style={styles.cancelButtonText}>Cancel</Text>
+                <Text style={styles.cancelButtonText}>Batal</Text>
               </TouchableOpacity>
 
               <TouchableOpacity
@@ -130,7 +130,7 @@ export default function ChangePasswordScreen() {
                 {loading ? (
                   <ActivityIndicator color="#fff" />
                 ) : (
-                  <Text style={styles.saveButtonText}>Change Password</Text>
+                  <Text style={styles.saveButtonText}>Tukar Kata Laluan</Text>
                 )}
               </TouchableOpacity>
             </View>

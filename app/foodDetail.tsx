@@ -34,7 +34,7 @@ export default function FoodDetailScreen() {
       setFood(foodData);
     } catch (error) {
       console.error('Error loading food details:', error);
-      Alert.alert('Error', 'Failed to load food details');
+      Alert.alert('Ralat', 'Gagal memuatkan butiran makanan');
     } finally {
       setLoading(false);
     }
@@ -46,15 +46,15 @@ export default function FoodDetailScreen() {
     addToCart(food, quantity, specialInstructions.trim() || undefined);
     
     Alert.alert(
-      'Added to Cart!',
-      `${quantity} x ${food.name} has been added to your cart.`,
+      'Ditambah ke Troli!',
+      `${quantity} x ${food.name} telah ditambah ke troli anda.`,
       [
         {
-          text: 'Continue Shopping',
+          text: 'Terus Membeli',
           onPress: () => router.back(),
         },
         {
-          text: 'View Cart',
+          text: 'Lihat Troli',
           onPress: () => router.push('/(tabs)/cart'),
         },
       ]
@@ -72,7 +72,7 @@ export default function FoodDetailScreen() {
     return (
       <View style={styles.loadingContainer}>
         <ActivityIndicator size="large" color="#007AFF" />
-        <Text style={styles.loadingText}>Loading food details...</Text>
+        <Text style={styles.loadingText}>Memuatkan butiran makanan...</Text>
       </View>
     );
   }
@@ -80,9 +80,9 @@ export default function FoodDetailScreen() {
   if (!food) {
     return (
       <View style={styles.errorContainer}>
-        <Text style={styles.errorText}>Food not found</Text>
+        <Text style={styles.errorText}>Makanan tidak dijumpai</Text>
         <TouchableOpacity style={styles.backButton} onPress={() => router.back()}>
-          <Text style={styles.backButtonText}>Go Back</Text>
+          <Text style={styles.backButtonText}>Kembali</Text>
         </TouchableOpacity>
       </View>
     );
@@ -98,7 +98,7 @@ export default function FoodDetailScreen() {
           <Image source={{ uri: food.image }} style={styles.foodImage} />
         ) : (
           <View style={styles.placeholderImage}>
-            <Text style={styles.placeholderText}>No Image Available</Text>
+            <Text style={styles.placeholderText}>Tiada Gambar Tersedia</Text>
           </View>
         )}
       </View>
@@ -113,7 +113,7 @@ export default function FoodDetailScreen() {
         {cartItem && (
           <View style={styles.cartStatus}>
             <Text style={styles.cartStatusText}>
-              {cartItem.quantity} in cart
+              {cartItem.quantity} dalam troli
             </Text>
           </View>
         )}
@@ -121,7 +121,7 @@ export default function FoodDetailScreen() {
         {/* Ingredients */}
         {food.ingredients && food.ingredients.length > 0 && (
           <View style={styles.section}>
-            <Text style={styles.sectionTitle}>Ingredients</Text>
+            <Text style={styles.sectionTitle}>Bahan-bahan</Text>
             <View style={styles.tagContainer}>
               {food.ingredients.map((ingredient, index) => (
                 <View key={index} style={styles.tag}>
@@ -135,7 +135,7 @@ export default function FoodDetailScreen() {
         {/* Allergens */}
         {food.allergens && food.allergens.length > 0 && (
           <View style={styles.section}>
-            <Text style={styles.sectionTitle}>Allergens</Text>
+            <Text style={styles.sectionTitle}>Alergen</Text>
             <View style={styles.tagContainer}>
               {food.allergens.map((allergen, index) => (
                 <View key={index} style={[styles.tag, styles.allergenTag]}>
@@ -148,12 +148,12 @@ export default function FoodDetailScreen() {
 
         {/* Availability */}
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Availability</Text>
+          <Text style={styles.sectionTitle}>Ketersediaan</Text>
           <Text style={[
             styles.availabilityText,
             food.isAvailable ? styles.availableText : styles.unavailableText
           ]}>
-            {food.isAvailable ? 'Available' : 'Currently Unavailable'}
+            {food.isAvailable ? 'Tersedia' : 'Tidak Tersedia Buat Masa Ini'}
           </Text>
         </View>
       </View>
@@ -161,10 +161,10 @@ export default function FoodDetailScreen() {
       {/* Special Instructions */}
       {food.isAvailable && (
         <View style={styles.instructionsContainer}>
-          <Text style={styles.sectionTitle}>Special Instructions</Text>
+          <Text style={styles.sectionTitle}>Arahan Khas</Text>
           <TextInput
             style={styles.instructionsInput}
-            placeholder="Any special requests? (optional)"
+            placeholder="Apa-apa permintaan khas? (pilihan)"
             value={specialInstructions}
             onChangeText={setSpecialInstructions}
             multiline
@@ -178,7 +178,7 @@ export default function FoodDetailScreen() {
       {food.isAvailable && (
         <View style={styles.cartSection}>
           <View style={styles.quantityContainer}>
-            <Text style={styles.quantityLabel}>Quantity</Text>
+            <Text style={styles.quantityLabel}>Kuantiti</Text>
             <View style={styles.quantityControls}>
               <TouchableOpacity
                 style={styles.quantityButton}
@@ -198,7 +198,7 @@ export default function FoodDetailScreen() {
 
           <TouchableOpacity style={styles.addToCartButton} onPress={handleAddToCart}>
             <Text style={styles.addToCartText}>
-              Add to Cart - ${(food.price * quantity).toFixed(2)}
+              Tambah ke Troli - RM{(food.price * quantity).toFixed(2)}
             </Text>
           </TouchableOpacity>
         </View>

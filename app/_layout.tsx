@@ -65,7 +65,7 @@ function RootLayoutNav() {
         <Stack.Screen 
           name="editProfile" 
           options={{ 
-            title: 'Edit Profile',
+            title: 'Sunting Profil',
             headerShown: true,
             presentation: 'modal'
           }} 
@@ -73,7 +73,7 @@ function RootLayoutNav() {
         <Stack.Screen 
           name="changePassword" 
           options={{ 
-            title: 'Change Password',
+            title: 'Tukar Kata Laluan',
             headerShown: true,
             presentation: 'modal'
           }} 
@@ -81,7 +81,7 @@ function RootLayoutNav() {
         <Stack.Screen 
           name="foodDetail" 
           options={{ 
-            title: 'Food Details',
+            title: 'Butiran Makanan',
             headerShown: true,
             presentation: 'card'
           }} 
@@ -89,7 +89,7 @@ function RootLayoutNav() {
         <Stack.Screen 
           name="adminMenus" 
           options={{ 
-            title: 'Menu Management',
+            title: 'Pengurusan Menu',
             headerShown: false,
             presentation: 'card'
           }} 
@@ -97,7 +97,7 @@ function RootLayoutNav() {
         <Stack.Screen 
           name="adminMenuForm" 
           options={{ 
-            title: 'Menu Form',
+            title: 'Borang Menu',
             headerShown: false,
             presentation: 'modal'
           }} 
@@ -105,7 +105,7 @@ function RootLayoutNav() {
         <Stack.Screen 
           name="adminFoods" 
           options={{ 
-            title: 'Food Management',
+            title: 'Pengurusan Makanan',
             headerShown: false,
             presentation: 'card'
           }} 
@@ -113,7 +113,7 @@ function RootLayoutNav() {
         <Stack.Screen 
           name="adminFoodForm" 
           options={{ 
-            title: 'Food Form',
+            title: 'Borang Makanan',
             headerShown: false,
             presentation: 'modal'
           }} 

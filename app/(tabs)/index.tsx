@@ -11,47 +11,47 @@ export default function HomeScreen() {
     <ScrollView style={styles.container}>
       <View style={styles.header}>
         <Text style={styles.title}>Block Twenty-9</Text>
-        <Text style={styles.subtitle}>Welcome back, {userProfile?.displayName || 'Guest'}!</Text>
+        <Text style={styles.subtitle}>Selamat datang kembali, {userProfile?.displayName || 'Tetamu'}!</Text>
       </View>
 
       <View style={styles.section}>
-        <Text style={styles.sectionTitle}>Quick Actions</Text>
+        <Text style={styles.sectionTitle}>Tindakan Pantas</Text>
         
         <TouchableOpacity 
           style={styles.actionButton}
           onPress={() => router.push('/(tabs)/menu')}
         >
-          <Text style={styles.actionButtonText}>Browse Menu</Text>
+          <Text style={styles.actionButtonText}>Lihat Menu</Text>
         </TouchableOpacity>
 
         <TouchableOpacity 
           style={styles.actionButton}
           onPress={() => router.push('/(tabs)/cart')}
         >
-          <Text style={styles.actionButtonText}>View Cart</Text>
+          <Text style={styles.actionButtonText}>Lihat Troli</Text>
         </TouchableOpacity>
 
         <TouchableOpacity 
           style={styles.actionButton}
           onPress={() => router.push('/(tabs)/orders')}
         >
-          <Text style={styles.actionButtonText}>My Orders</Text>
+          <Text style={styles.actionButtonText}>Pesanan Saya</Text>
         </TouchableOpacity>
       </View>
 
       <View style={styles.section}>
-        <Text style={styles.sectionTitle}>Featured Items</Text>
+        <Text style={styles.sectionTitle}>Item Pilihan</Text>
         <View style={styles.featuredItem}>
-          <Text style={styles.featuredItemName}>Signature Burger</Text>
-          <Text style={styles.featuredItemPrice}>$12.99</Text>
+          <Text style={styles.featuredItemName}>Burger Signature</Text>
+          <Text style={styles.featuredItemPrice}>RM12.99</Text>
         </View>
         <View style={styles.featuredItem}>
-          <Text style={styles.featuredItemName}>Truffle Fries</Text>
-          <Text style={styles.featuredItemPrice}>$8.99</Text>
+          <Text style={styles.featuredItemName}>Kentang Truffle</Text>
+          <Text style={styles.featuredItemPrice}>RM8.99</Text>
         </View>
         <View style={styles.featuredItem}>
-          <Text style={styles.featuredItemName}>Craft Beer</Text>
-          <Text style={styles.featuredItemPrice}>$5.99</Text>
+          <Text style={styles.featuredItemName}>Bir Artisan</Text>
+          <Text style={styles.featuredItemPrice}>RM5.99</Text>
         </View>
       </View>
     </ScrollView>

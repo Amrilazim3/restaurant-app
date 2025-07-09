@@ -70,12 +70,12 @@ export default function AdminMenuFormScreen() {
           isActive: menu.isActive,
         });
       } else {
-        Alert.alert('Error', 'Menu not found');
+        Alert.alert('Ralat', 'Menu tidak dijumpai');
         router.back();
       }
     } catch (error) {
       console.error('Error loading menu:', error);
-      Alert.alert('Error', 'Failed to load menu details');
+      Alert.alert('Ralat', 'Gagal memuatkan maklumat menu');
       router.back();
     } finally {
       setInitialLoading(false);
@@ -112,7 +112,7 @@ export default function AdminMenuFormScreen() {
   };
 
   const handleImagePicker = () => {
-    const options = ['Take Photo', 'Choose from Gallery', 'Use Placeholder', 'Cancel'];
+    const options = ['Ambil Foto', 'Pilih dari Galeri', 'Gunakan Contoh', 'Batal'];
     
     if (Platform.OS === 'ios') {
       ActionSheetIOS.showActionSheetWithOptions(
@@ -131,11 +131,11 @@ export default function AdminMenuFormScreen() {
         }
       );
     } else {
-      Alert.alert('Select Image', 'Choose image source:', [
-        { text: 'Take Photo', onPress: () => pickImage('camera') },
-        { text: 'Choose from Gallery', onPress: () => pickImage('gallery') },
-        { text: 'Use Placeholder', onPress: () => usePlaceholderImage() },
-        { text: 'Cancel', style: 'cancel' },
+      Alert.alert('Pilih Gambar', 'Pilih sumber gambar:', [
+        { text: 'Ambil Foto', onPress: () => pickImage('camera') },
+        { text: 'Pilih dari Galeri', onPress: () => pickImage('gallery') },
+        { text: 'Gunakan Contoh', onPress: () => usePlaceholderImage() },
+        { text: 'Batal', style: 'cancel' },
       ]);
     }
   };
@@ -158,7 +158,7 @@ export default function AdminMenuFormScreen() {
       }));
     } catch (error) {
       console.error('Error setting placeholder image:', error);
-      Alert.alert('Error', 'Failed to set placeholder image. Please try again.');
+      Alert.alert('Ralat', 'Gagal menetapkan gambar contoh. Sila cuba lagi.');
     } finally {
       setImageUploading(false);
     }
@@ -196,7 +196,7 @@ export default function AdminMenuFormScreen() {
       }
     } catch (error) {
       console.error('Error picking image:', error);
-      Alert.alert('Error', 'Failed to upload image. Please try again.');
+      Alert.alert('Ralat', 'Gagal memuat naik gambar. Sila cuba lagi.');
     } finally {
       setImageUploading(false);
     }
@@ -204,12 +204,12 @@ export default function AdminMenuFormScreen() {
 
   const handleRemoveImage = () => {
     Alert.alert(
-      'Remove Image',
-      'Are you sure you want to remove this image?',
+      'Buang Gambar',
+      'Adakah anda pasti mahu membuang gambar ini?',
       [
-        { text: 'Cancel', style: 'cancel' },
+        { text: 'Batal', style: 'cancel' },
         {
-          text: 'Remove',
+          text: 'Buang',
           style: 'destructive',
           onPress: async () => {
             // Delete image from storage if it was uploaded in this session
@@ -244,7 +244,7 @@ export default function AdminMenuFormScreen() {
           isActive: formData.isActive,
         });
         
-        Alert.alert('Success', 'Menu updated successfully');
+        Alert.alert('Berjaya', 'Menu berjaya dikemas kini');
       } else {
         await menuService.createMenu({
           name: formData.name.trim(),
@@ -253,13 +253,13 @@ export default function AdminMenuFormScreen() {
           isActive: formData.isActive,
         });
         
-        Alert.alert('Success', 'Menu created successfully');
+        Alert.alert('Berjaya', 'Menu berjaya dicipta');
       }
       
       router.back();
     } catch (error) {
       console.error('Error saving menu:', error);
-      Alert.alert('Error', 'Failed to save menu. Please try again.');
+      Alert.alert('Ralat', 'Gagal menyimpan menu. Sila cuba lagi.');
     } finally {
       setLoading(false);
     }
@@ -267,12 +267,12 @@ export default function AdminMenuFormScreen() {
 
   const handleCancel = () => {
     Alert.alert(
-      'Discard Changes',
-      'Are you sure you want to discard your changes?',
+      'Buang Perubahan',
+      'Adakah anda pasti mahu membuang perubahan anda?',
       [
-        { text: 'Continue Editing', style: 'cancel' },
+        { text: 'Teruskan Sunting', style: 'cancel' },
         {
-          text: 'Discard',
+          text: 'Buang',
           style: 'destructive',
           onPress: async () => {
             // Clean up uploaded image if canceling
@@ -303,10 +303,10 @@ export default function AdminMenuFormScreen() {
       {/* Header */}
       <View style={styles.header}>
         <TouchableOpacity onPress={handleCancel} style={styles.cancelButton}>
-          <Text style={styles.cancelButtonText}>Cancel</Text>
+          <Text style={styles.cancelButtonText}>Batal</Text>
         </TouchableOpacity>
         <Text style={styles.title}>
-          {isEditing ? 'Edit Menu' : 'Create Menu'}
+          {isEditing ? 'Sunting Menu' : 'Cipta Menu'}
         </Text>
         <TouchableOpacity
           onPress={handleSubmit}
@@ -316,7 +316,7 @@ export default function AdminMenuFormScreen() {
           {loading ? (
             <ActivityIndicator size="small" color="#fff" />
           ) : (
-            <Text style={styles.saveButtonText}>Save</Text>
+            <Text style={styles.saveButtonText}>Simpan</Text>
           )}
         </TouchableOpacity>
       </View>
@@ -332,10 +332,10 @@ export default function AdminMenuFormScreen() {
 
         {/* Menu Name */}
         <View style={styles.section}>
-          <Text style={styles.label}>Menu Name *</Text>
+          <Text style={styles.label}>Nama Menu *</Text>
           <TextInput
             style={[styles.input, errors.name && styles.inputError]}
-            placeholder="Enter menu name"
+            placeholder="Masukkan nama menu"
             value={formData.name}
             onChangeText={(text) => handleInputChange('name', text)}
             maxLength={50}
@@ -350,10 +350,10 @@ export default function AdminMenuFormScreen() {
 
         {/* Menu Description */}
         <View style={styles.section}>
-          <Text style={styles.label}>Description *</Text>
+          <Text style={styles.label}>Penerangan *</Text>
           <TextInput
             style={[styles.textArea, errors.description && styles.inputError]}
-            placeholder="Enter menu description"
+            placeholder="Masukkan penerangan menu"
             value={formData.description}
             onChangeText={(text) => handleInputChange('description', text)}
             multiline
@@ -370,7 +370,7 @@ export default function AdminMenuFormScreen() {
 
         {/* Menu Image */}
         <View style={styles.section}>
-          <Text style={styles.label}>Menu Image</Text>
+          <Text style={styles.label}>Gambar Menu</Text>
           
           {formData.image ? (
             <View style={styles.imageContainer}>
@@ -394,7 +394,7 @@ export default function AdminMenuFormScreen() {
                 <>
                   <Ionicons name="camera" size={32} color="#666" />
                   <Text style={styles.imagePlaceholderText}>
-                    Tap to add image
+                    Sentuh untuk tambah gambar
                   </Text>
                 </>
               )}
@@ -408,7 +408,7 @@ export default function AdminMenuFormScreen() {
               disabled={imageUploading}
             >
               <Text style={styles.changeImageText}>
-                {imageUploading ? 'Uploading...' : 'Change Image'}
+                {imageUploading ? 'Memuat naik...' : 'Tukar Gambar'}
               </Text>
             </TouchableOpacity>
           )}
@@ -417,7 +417,7 @@ export default function AdminMenuFormScreen() {
         {/* Menu Status */}
         <View style={styles.section}>
           <View style={styles.switchContainer}>
-            <Text style={styles.label}>Active Status</Text>
+            <Text style={styles.label}>Status Aktif</Text>
             <Switch
               value={formData.isActive}
               onValueChange={(value) => handleInputChange('isActive', value)}
@@ -427,8 +427,8 @@ export default function AdminMenuFormScreen() {
           </View>
           <Text style={styles.switchDescription}>
             {formData.isActive 
-              ? 'Menu is visible to customers' 
-              : 'Menu is hidden from customers'
+              ? 'Menu kelihatan kepada pelanggan' 
+              : 'Menu disembunyikan dari pelanggan'
             }
           </Text>
         </View>

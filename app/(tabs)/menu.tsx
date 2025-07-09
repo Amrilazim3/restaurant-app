@@ -52,7 +52,7 @@ export default function MenuScreen() {
       }
     } catch (error) {
       console.error('Error loading menus:', error);
-      Alert.alert('Error', 'Failed to load menus');
+      Alert.alert('Ralat', 'Gagal memuatkan menu');
     } finally {
       setLoading(false);
     }
@@ -64,7 +64,7 @@ export default function MenuScreen() {
       setFoods(foodsData);
     } catch (error) {
       console.error('Error loading foods:', error);
-      Alert.alert('Error', 'Failed to load foods');
+      Alert.alert('Ralat', 'Gagal memuatkan makanan');
     }
   };
 
@@ -77,7 +77,7 @@ export default function MenuScreen() {
       setSearchResults(results);
     } catch (error) {
       console.error('Error searching foods:', error);
-      Alert.alert('Error', 'Failed to search foods');
+      Alert.alert('Ralat', 'Gagal mencari makanan');
     } finally {
       setIsSearching(false);
     }
@@ -99,15 +99,15 @@ export default function MenuScreen() {
   const handleAddToCart = (food: Food) => {
     addToCart(food, 1);
     Alert.alert(
-      'Added to Cart!',
-      `${food.name} has been added to your cart.`,
+      'Ditambah ke Troli!',
+      `${food.name} telah ditambah ke troli anda.`,
       [
         {
-          text: 'Continue Shopping',
+          text: 'Terus Membeli',
           style: 'cancel',
         },
         {
-          text: 'View Cart',
+          text: 'Lihat Troli',
           onPress: () => router.push('/(tabs)/cart'),
         },
       ]
@@ -134,7 +134,7 @@ export default function MenuScreen() {
             <Image source={{ uri: food.image }} style={styles.foodImage} />
           ) : (
             <View style={styles.placeholderImage}>
-              <Text style={styles.placeholderText}>No Image</Text>
+              <Text style={styles.placeholderText}>Tiada Gambar</Text>
             </View>
           )}
         </View>
@@ -144,7 +144,7 @@ export default function MenuScreen() {
             {food.description}
           </Text>
           <View style={styles.foodFooter}>
-            <Text style={styles.foodPrice}>${food.price.toFixed(2)}</Text>
+            <Text style={styles.foodPrice}>RM{food.price.toFixed(2)}</Text>
             <TouchableOpacity 
               style={[
                 styles.addButton,
@@ -156,7 +156,7 @@ export default function MenuScreen() {
                 styles.addButtonText,
                 cartItem && styles.addButtonTextInCart
               ]}>
-                {cartItem ? `In Cart (${cartItem.quantity})` : 'Add to Cart'}
+                {cartItem ? `Dalam Troli (${cartItem.quantity})` : 'Tambah ke Troli'}
               </Text>
             </TouchableOpacity>
           </View>
@@ -169,7 +169,7 @@ export default function MenuScreen() {
     return (
       <View style={styles.loadingContainer}>
         <ActivityIndicator size="large" color="#007AFF" />
-        <Text style={styles.loadingText}>Loading menu...</Text>
+        <Text style={styles.loadingText}>Memuatkan menu...</Text>
       </View>
     );
   }
@@ -183,15 +183,15 @@ export default function MenuScreen() {
     >
       {/* Header */}
       <View style={styles.header}>
-        <Text style={styles.title}>Our Menu</Text>
-        <Text style={styles.subtitle}>Delicious food awaits you</Text>
+        <Text style={styles.title}>Menu Kami</Text>
+        <Text style={styles.subtitle}>Makanan lazat menanti anda</Text>
       </View>
 
       {/* Search Bar */}
       <View style={styles.searchContainer}>
         <TextInput
           style={styles.searchInput}
-          placeholder="Search for food..."
+          placeholder="Cari makanan..."
           value={searchTerm}
           onChangeText={setSearchTerm}
           clearButtonMode="while-editing"
@@ -202,14 +202,14 @@ export default function MenuScreen() {
       {searchTerm.trim() && (
         <View style={styles.searchSection}>
           <Text style={styles.sectionTitle}>
-            Search Results {isSearching && <ActivityIndicator size="small" />}
+            Hasil Carian {isSearching && <ActivityIndicator size="small" />}
           </Text>
           {searchResults.length > 0 ? (
             <View style={styles.foodGrid}>
               {searchResults.map(renderFoodItem)}
             </View>
           ) : !isSearching && (
-            <Text style={styles.noResultsText}>No food items found</Text>
+            <Text style={styles.noResultsText}>Tiada item makanan dijumpai</Text>
           )}
         </View>
       )}
@@ -218,7 +218,7 @@ export default function MenuScreen() {
       {!searchTerm.trim() && (
         <>
           <View style={styles.menuContainer}>
-            <Text style={styles.sectionTitle}>Categories</Text>
+            <Text style={styles.sectionTitle}>Kategori</Text>
             <ScrollView 
               horizontal 
               showsHorizontalScrollIndicator={false}
@@ -248,7 +248,7 @@ export default function MenuScreen() {
           {selectedMenu && (
             <View style={styles.foodSection}>
               <Text style={styles.sectionTitle}>
-                {selectedMenu.name} ({foods.length} items)
+                {selectedMenu.name} ({foods.length} item)
               </Text>
               <View style={styles.foodGrid}>
                 {foods.map(renderFoodItem)}

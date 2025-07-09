@@ -24,7 +24,7 @@ export default function EditProfileScreen() {
 
   const handleSaveProfile = async () => {
     if (!displayName.trim()) {
-      Alert.alert('Error', 'Name is required');
+      Alert.alert('Ralat', 'Nama diperlukan');
       return;
     }
 
@@ -36,10 +36,10 @@ export default function EditProfileScreen() {
         address: address.trim() || undefined,
       });
       
-      Alert.alert('Success', 'Profile updated successfully!');
+      Alert.alert('Berjaya', 'Profil berjaya dikemas kini!');
       router.back();
     } catch (error: any) {
-      Alert.alert('Error', error.message || 'Failed to update profile');
+      Alert.alert('Ralat', error.message || 'Gagal mengemas kini profil');
     } finally {
       setLoading(false);
     }
@@ -52,15 +52,15 @@ export default function EditProfileScreen() {
     >
       <ScrollView contentContainerStyle={styles.scrollContainer}>
         <View style={styles.content}>
-          <Text style={styles.title}>Edit Profile</Text>
-          <Text style={styles.subtitle}>Update your personal information</Text>
+          <Text style={styles.title}>Sunting Profil</Text>
+          <Text style={styles.subtitle}>Kemas kini maklumat peribadi anda</Text>
 
           <View style={styles.form}>
             <View style={styles.inputGroup}>
-              <Text style={styles.label}>Full Name *</Text>
+              <Text style={styles.label}>Nama Penuh *</Text>
               <TextInput
                 style={styles.input}
-                placeholder="Enter your full name"
+                placeholder="Masukkan nama penuh anda"
                 value={displayName}
                 onChangeText={setDisplayName}
                 autoCapitalize="words"
@@ -69,20 +69,20 @@ export default function EditProfileScreen() {
             </View>
 
             <View style={styles.inputGroup}>
-              <Text style={styles.label}>Email</Text>
+              <Text style={styles.label}>E-mel</Text>
               <TextInput
                 style={[styles.input, styles.disabledInput]}
                 value={userProfile?.email}
                 editable={false}
               />
-              <Text style={styles.helperText}>Email cannot be changed</Text>
+              <Text style={styles.helperText}>E-mel tidak boleh diubah</Text>
             </View>
 
             <View style={styles.inputGroup}>
-              <Text style={styles.label}>Phone Number</Text>
+              <Text style={styles.label}>Nombor Telefon</Text>
               <TextInput
                 style={styles.input}
-                placeholder="Enter your phone number"
+                placeholder="Masukkan nombor telefon anda"
                 value={phoneNumber}
                 onChangeText={setPhoneNumber}
                 keyboardType="phone-pad"
@@ -91,10 +91,10 @@ export default function EditProfileScreen() {
             </View>
 
             <View style={styles.inputGroup}>
-              <Text style={styles.label}>Address</Text>
+              <Text style={styles.label}>Alamat</Text>
               <TextInput
                 style={[styles.input, styles.textArea]}
-                placeholder="Enter your address"
+                placeholder="Masukkan alamat anda"
                 value={address}
                 onChangeText={setAddress}
                 multiline
@@ -108,7 +108,7 @@ export default function EditProfileScreen() {
                 style={[styles.button, styles.cancelButton]}
                 onPress={() => router.back()}
               >
-                <Text style={styles.cancelButtonText}>Cancel</Text>
+                <Text style={styles.cancelButtonText}>Batal</Text>
               </TouchableOpacity>
 
               <TouchableOpacity
@@ -119,7 +119,7 @@ export default function EditProfileScreen() {
                 {loading ? (
                   <ActivityIndicator color="#fff" />
                 ) : (
-                  <Text style={styles.saveButtonText}>Save Changes</Text>
+                  <Text style={styles.saveButtonText}>Simpan Perubahan</Text>
                 )}
               </TouchableOpacity>
             </View>

@@ -26,23 +26,23 @@ export default function RegisterScreen() {
 
   const handleRegister = async () => {
     if (!email || !password || !confirmPassword || !displayName) {
-      Alert.alert('Error', 'Please fill in all fields');
+      Alert.alert('Ralat', 'Sila isi semua medan');
       return;
     }
 
     if (password !== confirmPassword) {
-      Alert.alert('Error', 'Passwords do not match');
+      Alert.alert('Ralat', 'Kata laluan tidak sepadan');
       return;
     }
 
     if (password.length < 6) {
-      Alert.alert('Error', 'Password must be at least 6 characters');
+      Alert.alert('Ralat', 'Kata laluan mesti sekurang-kurangnya 6 aksara');
       return;
     }
 
     // Validate admin passkey if admin is selected
     if (isAdmin && !adminPasskey) {
-      Alert.alert('Error', 'Please enter the admin passkey');
+      Alert.alert('Ralat', 'Sila masukkan kunci admin');
       return;
     }
 
@@ -52,7 +52,7 @@ export default function RegisterScreen() {
       await register(email, password, displayName, role, adminPasskey);
       router.replace('/(tabs)');
     } catch (error: any) {
-      Alert.alert('Registration Error', error.message || 'Failed to register');
+      Alert.alert('Ralat Pendaftaran', error.message || 'Gagal mendaftar');
     } finally {
       setLoading(false);
     }
@@ -66,12 +66,12 @@ export default function RegisterScreen() {
       <ScrollView contentContainerStyle={styles.scrollContainer}>
         <View style={styles.content}>
           <Text style={styles.title}>Block Twenty-9</Text>
-          <Text style={styles.subtitle}>Create your account</Text>
+          <Text style={styles.subtitle}>Cipta akaun anda</Text>
 
           <View style={styles.form}>
             <TextInput
               style={styles.input}
-              placeholder="Full Name"
+              placeholder="Nama Penuh"
               value={displayName}
               onChangeText={setDisplayName}
               autoCapitalize="words"
@@ -80,7 +80,7 @@ export default function RegisterScreen() {
 
             <TextInput
               style={styles.input}
-              placeholder="Email"
+              placeholder="E-mel"
               value={email}
               onChangeText={setEmail}
               keyboardType="email-address"
@@ -90,7 +90,7 @@ export default function RegisterScreen() {
 
             <TextInput
               style={styles.input}
-              placeholder="Password"
+              placeholder="Kata Laluan"
               value={password}
               onChangeText={setPassword}
               secureTextEntry
@@ -100,7 +100,7 @@ export default function RegisterScreen() {
 
             <TextInput
               style={styles.input}
-              placeholder="Confirm Password"
+              placeholder="Sahkan Kata Laluan"
               value={confirmPassword}
               onChangeText={setConfirmPassword}
               secureTextEntry
@@ -110,7 +110,7 @@ export default function RegisterScreen() {
 
             {/* Role Selection */}
             <View style={styles.roleContainer}>
-              <Text style={styles.roleLabel}>Account Type:</Text>
+              <Text style={styles.roleLabel}>Jenis Akaun:</Text>
               <View style={styles.roleOptions}>
                 <TouchableOpacity
                   style={[
@@ -123,7 +123,7 @@ export default function RegisterScreen() {
                     styles.roleOptionText,
                     !isAdmin && styles.roleOptionTextActive
                   ]}>
-                    User
+                    Pengguna
                   </Text>
                 </TouchableOpacity>
                 <TouchableOpacity
@@ -147,7 +147,7 @@ export default function RegisterScreen() {
             {isAdmin && (
               <TextInput
                 style={styles.input}
-                placeholder="Admin Passkey"
+                placeholder="Kunci Admin"
                 value={adminPasskey}
                 onChangeText={setAdminPasskey}
                 secureTextEntry
@@ -165,15 +165,15 @@ export default function RegisterScreen() {
                 <ActivityIndicator color="#fff" />
               ) : (
                 <Text style={styles.buttonText}>
-                  Register as {isAdmin ? 'Admin' : 'User'}
+                  Daftar sebagai {isAdmin ? 'Admin' : 'Pengguna'}
                 </Text>
               )}
             </TouchableOpacity>
 
             <View style={styles.linkContainer}>
-              <Text style={styles.linkText}>Already have an account? </Text>
+              <Text style={styles.linkText}>Sudah ada akaun? </Text>
               <Link href="/(auth)/login" style={styles.link}>
-                Sign in
+                Log Masuk
               </Link>
             </View>
           </View>

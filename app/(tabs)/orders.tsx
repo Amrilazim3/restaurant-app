@@ -8,33 +8,33 @@ export default function OrdersScreen() {
     {
       id: 1,
       date: '2024-01-15',
-      status: 'Delivered',
+      status: 'Dihantar',
       total: 25.98,
-      items: ['Signature Burger', 'Truffle Fries'],
+      items: ['Burger Signature', 'Kentang Truffle'],
     },
     {
       id: 2,
       date: '2024-01-10',
-      status: 'Delivered',
+      status: 'Dihantar',
       total: 18.99,
-      items: ['Grilled Salmon'],
+      items: ['Salmon Panggang'],
     },
     {
       id: 3,
       date: '2024-01-08',
-      status: 'Cancelled',
+      status: 'Dibatalkan',
       total: 12.99,
-      items: ['Caesar Salad'],
+      items: ['Salad Caesar'],
     },
   ];
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case 'Delivered':
+      case 'Dihantar':
         return '#28a745';
-      case 'In Progress':
+      case 'Dalam Proses':
         return '#ffc107';
-      case 'Cancelled':
+      case 'Dibatalkan':
         return '#dc3545';
       default:
         return '#6c757d';
@@ -44,15 +44,15 @@ export default function OrdersScreen() {
   return (
     <ScrollView style={styles.container}>
       <View style={styles.header}>
-        <Text style={styles.title}>Orders</Text>
-        <Text style={styles.subtitle}>Your order history</Text>
+        <Text style={styles.title}>Pesanan</Text>
+        <Text style={styles.subtitle}>Sejarah pesanan anda</Text>
       </View>
 
       <View style={styles.ordersSection}>
         {orders.length === 0 ? (
           <View style={styles.emptyOrders}>
-            <Text style={styles.emptyOrdersText}>No orders yet</Text>
-            <Text style={styles.emptyOrdersSubtext}>Place your first order from our menu!</Text>
+            <Text style={styles.emptyOrdersText}>Tiada pesanan lagi</Text>
+            <Text style={styles.emptyOrdersSubtext}>Buat pesanan pertama anda dari menu kami!</Text>
           </View>
         ) : (
           orders.map((order) => (
@@ -67,7 +67,7 @@ export default function OrdersScreen() {
                 <Text style={styles.orderItems}>
                   {order.items.join(', ')}
                 </Text>
-                <Text style={styles.orderTotal}>Total: ${order.total.toFixed(2)}</Text>
+                <Text style={styles.orderTotal}>Jumlah: RM{order.total.toFixed(2)}</Text>
               </View>
             </TouchableOpacity>
           ))

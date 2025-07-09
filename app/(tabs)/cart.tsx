@@ -34,15 +34,15 @@ export default function CartScreen() {
 
   const handleRemoveItem = (item: CartItem) => {
     Alert.alert(
-      'Remove Item',
-      `Remove ${item.food.name} from cart?`,
+      'Buang Item',
+      `Buang ${item.food.name} dari troli?`,
       [
         {
-          text: 'Cancel',
+          text: 'Batal',
           style: 'cancel',
         },
         {
-          text: 'Remove',
+          text: 'Buang',
           style: 'destructive',
           onPress: () => removeFromCart(item.id),
         },
@@ -52,15 +52,15 @@ export default function CartScreen() {
 
   const handleClearCart = () => {
     Alert.alert(
-      'Clear Cart',
-      'Are you sure you want to remove all items from your cart?',
+      'Kosongkan Troli',
+      'Adakah anda pasti mahu membuang semua item dari troli anda?',
       [
         {
-          text: 'Cancel',
+          text: 'Batal',
           style: 'cancel',
         },
         {
-          text: 'Clear All',
+          text: 'Kosongkan Semua',
           style: 'destructive',
           onPress: clearCart,
         },
@@ -70,12 +70,12 @@ export default function CartScreen() {
 
   const handleCheckout = () => {
     if (cartItems.length === 0) {
-      Alert.alert('Cart Empty', 'Add some items to your cart first!');
+      Alert.alert('Troli Kosong', 'Tambah beberapa item ke troli anda terlebih dahulu!');
       return;
     }
     
     // TODO: Implement checkout flow
-    Alert.alert('Checkout', 'Checkout functionality will be implemented soon!');
+    Alert.alert('Checkout', 'Fungsi checkout akan dilaksanakan tidak lama lagi!');
   };
 
   const renderCartItem = (item: CartItem) => (
@@ -85,18 +85,18 @@ export default function CartScreen() {
           <Image source={{ uri: item.food.image }} style={styles.itemImage} />
         ) : (
           <View style={styles.placeholderImage}>
-            <Text style={styles.placeholderText}>No Image</Text>
+            <Text style={styles.placeholderText}>Tiada Gambar</Text>
           </View>
         )}
       </View>
 
       <View style={styles.itemInfo}>
         <Text style={styles.itemName}>{item.food.name}</Text>
-        <Text style={styles.itemPrice}>${item.food.price.toFixed(2)} each</Text>
+        <Text style={styles.itemPrice}>RM{item.food.price.toFixed(2)} setiap</Text>
         
         {item.specialInstructions && (
           <Text style={styles.specialInstructions}>
-            Note: {item.specialInstructions}
+            Nota: {item.specialInstructions}
           </Text>
         )}
 
@@ -121,14 +121,14 @@ export default function CartScreen() {
             style={styles.removeButton}
             onPress={() => handleRemoveItem(item)}
           >
-            <Text style={styles.removeButtonText}>Remove</Text>
+            <Text style={styles.removeButtonText}>Buang</Text>
           </TouchableOpacity>
         </View>
       </View>
 
       <View style={styles.itemTotal}>
         <Text style={styles.itemTotalText}>
-          ${(item.food.price * item.quantity).toFixed(2)}
+          RM{(item.food.price * item.quantity).toFixed(2)}
         </Text>
       </View>
     </View>
@@ -138,7 +138,7 @@ export default function CartScreen() {
     return (
       <View style={styles.loadingContainer}>
         <ActivityIndicator size="large" color="#007AFF" />
-        <Text style={styles.loadingText}>Loading cart...</Text>
+        <Text style={styles.loadingText}>Memuatkan troli...</Text>
       </View>
     );
   }
@@ -147,28 +147,28 @@ export default function CartScreen() {
     <View style={styles.container}>
       {/* Header */}
       <View style={styles.header}>
-        <Text style={styles.title}>Your Cart</Text>
+        <Text style={styles.title}>Troli Anda</Text>
         <Text style={styles.subtitle}>
-          {cartCount} {cartCount === 1 ? 'item' : 'items'}
+          {cartCount} {cartCount === 1 ? 'item' : 'item'}
         </Text>
         {cartItems.length > 0 && (
           <TouchableOpacity style={styles.clearButton} onPress={handleClearCart}>
-            <Text style={styles.clearButtonText}>Clear All</Text>
+            <Text style={styles.clearButtonText}>Kosongkan Semua</Text>
           </TouchableOpacity>
         )}
       </View>
 
       {cartItems.length === 0 ? (
         <View style={styles.emptyContainer}>
-          <Text style={styles.emptyTitle}>Your cart is empty</Text>
+          <Text style={styles.emptyTitle}>Troli anda kosong</Text>
           <Text style={styles.emptySubtitle}>
-            Add some delicious items from our menu!
+            Tambah beberapa item lazat dari menu kami!
           </Text>
           <TouchableOpacity 
             style={styles.browseButton}
             onPress={() => router.push('/(tabs)/menu')}
           >
-            <Text style={styles.browseButtonText}>Browse Menu</Text>
+            <Text style={styles.browseButtonText}>Lihat Menu</Text>
           </TouchableOpacity>
         </View>
       ) : (
@@ -181,21 +181,21 @@ export default function CartScreen() {
           {/* Cart Summary */}
           <View style={styles.summaryContainer}>
             <View style={styles.summaryRow}>
-              <Text style={styles.summaryLabel}>Subtotal</Text>
-              <Text style={styles.summaryValue}>${cartTotal.toFixed(2)}</Text>
+              <Text style={styles.summaryLabel}>Jumlah</Text>
+              <Text style={styles.summaryValue}>RM{cartTotal.toFixed(2)}</Text>
             </View>
             <View style={styles.summaryRow}>
-              <Text style={styles.summaryLabel}>Delivery Fee</Text>
-              <Text style={styles.summaryValue}>$2.99</Text>
+              <Text style={styles.summaryLabel}>Bayaran Penghantaran</Text>
+              <Text style={styles.summaryValue}>RM2.99</Text>
             </View>
             <View style={styles.summaryRow}>
-              <Text style={styles.summaryLabel}>Tax</Text>
-              <Text style={styles.summaryValue}>${(cartTotal * 0.08).toFixed(2)}</Text>
+              <Text style={styles.summaryLabel}>Cukai</Text>
+              <Text style={styles.summaryValue}>RM{(cartTotal * 0.08).toFixed(2)}</Text>
             </View>
             <View style={[styles.summaryRow, styles.totalRow]}>
-              <Text style={styles.totalLabel}>Total</Text>
+              <Text style={styles.totalLabel}>Jumlah</Text>
               <Text style={styles.totalValue}>
-                ${(cartTotal + 2.99 + cartTotal * 0.08).toFixed(2)}
+                RM{(cartTotal + 2.99 + cartTotal * 0.08).toFixed(2)}
               </Text>
             </View>
           </View>
@@ -203,7 +203,7 @@ export default function CartScreen() {
           {/* Checkout Button */}
           <TouchableOpacity style={styles.checkoutButton} onPress={handleCheckout}>
             <Text style={styles.checkoutButtonText}>
-              Proceed to Checkout
+              Terus ke Checkout
             </Text>
           </TouchableOpacity>
         </>

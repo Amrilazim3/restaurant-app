@@ -22,7 +22,7 @@ export default function LoginScreen() {
 
   const handleLogin = async () => {
     if (!email || !password) {
-      Alert.alert('Error', 'Please fill in all fields');
+      Alert.alert('Ralat', 'Sila isi semua medan');
       return;
     }
 
@@ -31,7 +31,7 @@ export default function LoginScreen() {
       await login(email, password);
       router.replace('/(tabs)');
     } catch (error: any) {
-      Alert.alert('Login Error', error.message || 'Failed to login');
+      Alert.alert('Ralat Log Masuk', error.message || 'Gagal log masuk');
     } finally {
       setLoading(false);
     }
@@ -45,12 +45,12 @@ export default function LoginScreen() {
       <ScrollView contentContainerStyle={styles.scrollContainer}>
         <View style={styles.content}>
           <Text style={styles.title}>Block Twenty-9</Text>
-          <Text style={styles.subtitle}>Welcome back!</Text>
+          <Text style={styles.subtitle}>Selamat datang kembali!</Text>
 
           <View style={styles.form}>
             <TextInput
               style={styles.input}
-              placeholder="Email"
+              placeholder="E-mel"
               value={email}
               onChangeText={setEmail}
               keyboardType="email-address"
@@ -60,7 +60,7 @@ export default function LoginScreen() {
 
             <TextInput
               style={styles.input}
-              placeholder="Password"
+              placeholder="Kata Laluan"
               value={password}
               onChangeText={setPassword}
               secureTextEntry
@@ -76,14 +76,14 @@ export default function LoginScreen() {
               {loading ? (
                 <ActivityIndicator color="#fff" />
               ) : (
-                <Text style={styles.buttonText}>Login</Text>
+                <Text style={styles.buttonText}>Log Masuk</Text>
               )}
             </TouchableOpacity>
 
             <View style={styles.linkContainer}>
-              <Text style={styles.linkText}>Don't have an account? </Text>
+              <Text style={styles.linkText}>Tiada akaun? </Text>
               <Link href="/(auth)/register" style={styles.link}>
-                Sign up
+                Daftar
               </Link>
             </View>
           </View>

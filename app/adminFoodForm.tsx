@@ -95,13 +95,13 @@ export default function AdminFoodFormScreen() {
             isActive: food.isActive,
           });
         } else {
-          Alert.alert('Error', 'Food not found');
+          Alert.alert('Ralat', 'Makanan tidak dijumpai');
           router.back();
         }
       }
     } catch (error) {
       console.error('Error loading initial data:', error);
-      Alert.alert('Error', 'Failed to load data');
+      Alert.alert('Ralat', 'Gagal memuatkan data');
       router.back();
     } finally {
       setInitialLoading(false);
@@ -138,7 +138,7 @@ export default function AdminFoodFormScreen() {
     // Additional validation for price
     const price = parseFloat(formData.price);
     if (isNaN(price) || price <= 0) {
-      fieldErrors.price = 'Please enter a valid price';
+      fieldErrors.price = 'Sila masukkan harga yang sah';
     }
     
     setErrors(fieldErrors);
@@ -146,7 +146,7 @@ export default function AdminFoodFormScreen() {
   };
 
   const handleImagePicker = () => {
-    const options = ['Take Photo', 'Choose from Gallery', 'Use Placeholder', 'Cancel'];
+    const options = ['Ambil Gambar', 'Pilih dari Galeri', 'Guna Gambar Contoh', 'Batal'];
     
     if (Platform.OS === 'ios') {
       ActionSheetIOS.showActionSheetWithOptions(
@@ -165,11 +165,11 @@ export default function AdminFoodFormScreen() {
         }
       );
     } else {
-      Alert.alert('Select Image', 'Choose image source:', [
-        { text: 'Take Photo', onPress: () => pickImage('camera') },
-        { text: 'Choose from Gallery', onPress: () => pickImage('gallery') },
-        { text: 'Use Placeholder', onPress: () => usePlaceholderImage() },
-        { text: 'Cancel', style: 'cancel' },
+      Alert.alert('Pilih Gambar', 'Pilih sumber gambar:', [
+        { text: 'Ambil Gambar', onPress: () => pickImage('camera') },
+        { text: 'Pilih dari Galeri', onPress: () => pickImage('gallery') },
+        { text: 'Guna Gambar Contoh', onPress: () => usePlaceholderImage() },
+        { text: 'Batal', style: 'cancel' },
       ]);
     }
   };
@@ -192,7 +192,7 @@ export default function AdminFoodFormScreen() {
       }));
     } catch (error) {
       console.error('Error setting placeholder image:', error);
-      Alert.alert('Error', 'Failed to set placeholder image. Please try again.');
+      Alert.alert('Ralat', 'Gagal menetapkan gambar contoh. Sila cuba lagi.');
     } finally {
       setImageUploading(false);
     }
@@ -230,7 +230,7 @@ export default function AdminFoodFormScreen() {
       }
     } catch (error) {
       console.error('Error picking image:', error);
-      Alert.alert('Error', 'Failed to upload image. Please try again.');
+      Alert.alert('Ralat', 'Gagal memuat naik gambar. Sila cuba lagi.');
     } finally {
       setImageUploading(false);
     }
@@ -238,12 +238,12 @@ export default function AdminFoodFormScreen() {
 
   const handleRemoveImage = () => {
     Alert.alert(
-      'Remove Image',
-      'Are you sure you want to remove this image?',
+      'Buang Gambar',
+      'Adakah anda pasti mahu membuang gambar ini?',
       [
-        { text: 'Cancel', style: 'cancel' },
+        { text: 'Batal', style: 'cancel' },
         {
-          text: 'Remove',
+          text: 'Buang',
           style: 'destructive',
           onPress: async () => {
             if (formData.imagePath) {
@@ -308,16 +308,16 @@ export default function AdminFoodFormScreen() {
       
       if (isEditing) {
         await menuService.updateFood(id!, foodData);
-        Alert.alert('Success', 'Food updated successfully');
+        Alert.alert('Berjaya', 'Makanan berjaya dikemas kini');
       } else {
         await menuService.createFood(foodData);
-        Alert.alert('Success', 'Food created successfully');
+        Alert.alert('Berjaya', 'Makanan berjaya dicipta');
       }
       
       router.back();
     } catch (error) {
       console.error('Error saving food:', error);
-      Alert.alert('Error', 'Failed to save food. Please try again.');
+      Alert.alert('Ralat', 'Gagal menyimpan makanan. Sila cuba lagi.');
     } finally {
       setLoading(false);
     }
@@ -325,12 +325,12 @@ export default function AdminFoodFormScreen() {
 
   const handleCancel = () => {
     Alert.alert(
-      'Discard Changes',
-      'Are you sure you want to discard your changes?',
+      'Buang Perubahan',
+      'Adakah anda pasti mahu membuang perubahan anda?',
       [
-        { text: 'Continue Editing', style: 'cancel' },
+        { text: 'Teruskan Sunting', style: 'cancel' },
         {
-          text: 'Discard',
+          text: 'Buang',
           style: 'destructive',
           onPress: async () => {
             // Clean up uploaded image if canceling
@@ -348,7 +348,7 @@ export default function AdminFoodFormScreen() {
     return (
       <View style={styles.loadingContainer}>
         <ActivityIndicator size="large" color="#007AFF" />
-        <Text style={styles.loadingText}>Loading...</Text>
+        <Text style={styles.loadingText}>Memuatkan...</Text>
       </View>
     );
   }
@@ -361,10 +361,10 @@ export default function AdminFoodFormScreen() {
       {/* Header */}
       <View style={styles.header}>
         <TouchableOpacity onPress={handleCancel} style={styles.cancelButton}>
-          <Text style={styles.cancelButtonText}>Cancel</Text>
+          <Text style={styles.cancelButtonText}>Batal</Text>
         </TouchableOpacity>
         <Text style={styles.title}>
-          {isEditing ? 'Edit Food' : 'Create Food'}
+          {isEditing ? 'Sunting Makanan' : 'Cipta Makanan'}
         </Text>
         <TouchableOpacity
           onPress={handleSubmit}
@@ -374,7 +374,7 @@ export default function AdminFoodFormScreen() {
           {loading ? (
             <ActivityIndicator size="small" color="#fff" />
           ) : (
-            <Text style={styles.saveButtonText}>Save</Text>
+            <Text style={styles.saveButtonText}>Simpan</Text>
           )}
         </TouchableOpacity>
       </View>
@@ -390,14 +390,14 @@ export default function AdminFoodFormScreen() {
 
         {/* Food Name */}
         <View style={styles.section}>
-          <Text style={styles.label}>Food Name *</Text>
-          <TextInput
-            style={[styles.input, errors.name && styles.inputError]}
-            placeholder="Enter food name"
-            value={formData.name}
-            onChangeText={(text) => handleInputChange('name', text)}
-            maxLength={100}
-          />
+          <Text style={styles.label}>Nama Makanan *</Text>
+                      <TextInput
+              style={[styles.input, errors.name && styles.inputError]}
+              placeholder="Masukkan nama makanan"
+              value={formData.name}
+              onChangeText={(text) => handleInputChange('name', text)}
+              maxLength={100}
+            />
           {errors.name && (
             <Text style={styles.fieldError}>{errors.name}</Text>
           )}
@@ -435,7 +435,7 @@ export default function AdminFoodFormScreen() {
 
         {/* Price */}
         <View style={styles.section}>
-          <Text style={styles.label}>Price *</Text>
+          <Text style={styles.label}>Harga *</Text>
           <TextInput
             style={[styles.input, errors.price && styles.inputError]}
             placeholder="0.00"
@@ -450,16 +450,16 @@ export default function AdminFoodFormScreen() {
 
         {/* Description */}
         <View style={styles.section}>
-          <Text style={styles.label}>Description *</Text>
-          <TextInput
-            style={[styles.textArea, errors.description && styles.inputError]}
-            placeholder="Enter food description"
-            value={formData.description}
-            onChangeText={(text) => handleInputChange('description', text)}
-            multiline
-            numberOfLines={4}
-            maxLength={500}
-          />
+          <Text style={styles.label}>Penerangan *</Text>
+                      <TextInput
+              style={[styles.textArea, errors.description && styles.inputError]}
+              placeholder="Masukkan penerangan makanan"
+              value={formData.description}
+              onChangeText={(text) => handleInputChange('description', text)}
+              multiline
+              numberOfLines={4}
+              maxLength={500}
+            />
           {errors.description && (
             <Text style={styles.fieldError}>{errors.description}</Text>
           )}
@@ -470,7 +470,7 @@ export default function AdminFoodFormScreen() {
 
         {/* Food Image */}
         <View style={styles.section}>
-          <Text style={styles.label}>Food Image</Text>
+          <Text style={styles.label}>Gambar Makanan</Text>
           
           {formData.image ? (
             <View style={styles.imageContainer}>
@@ -494,7 +494,7 @@ export default function AdminFoodFormScreen() {
                 <>
                   <Ionicons name="camera" size={32} color="#666" />
                   <Text style={styles.imagePlaceholderText}>
-                    Tap to add image
+                    Sentuh untuk tambah gambar
                   </Text>
                 </>
               )}
@@ -508,7 +508,7 @@ export default function AdminFoodFormScreen() {
               disabled={imageUploading}
             >
               <Text style={styles.changeImageText}>
-                {imageUploading ? 'Uploading...' : 'Change Image'}
+                {imageUploading ? 'Memuat naik...' : 'Tukar Gambar'}
               </Text>
             </TouchableOpacity>
           )}
@@ -516,15 +516,15 @@ export default function AdminFoodFormScreen() {
 
         {/* Ingredients */}
         <View style={styles.section}>
-          <Text style={styles.label}>Ingredients</Text>
+          <Text style={styles.label}>Bahan-bahan</Text>
           <View style={styles.tagInputContainer}>
-            <TextInput
-              style={styles.tagInput}
-              placeholder="Add ingredient"
-              value={newIngredient}
-              onChangeText={setNewIngredient}
-              onSubmitEditing={addIngredient}
-            />
+                          <TextInput
+                style={styles.tagInput}
+                placeholder="Tambah bahan"
+                value={newIngredient}
+                onChangeText={setNewIngredient}
+                onSubmitEditing={addIngredient}
+              />
             <TouchableOpacity style={styles.addButton} onPress={addIngredient}>
               <Ionicons name="add" size={20} color="#007AFF" />
             </TouchableOpacity>
@@ -543,15 +543,15 @@ export default function AdminFoodFormScreen() {
 
         {/* Allergens */}
         <View style={styles.section}>
-          <Text style={styles.label}>Allergens</Text>
+          <Text style={styles.label}>Alergen</Text>
           <View style={styles.tagInputContainer}>
-            <TextInput
-              style={styles.tagInput}
-              placeholder="Add allergen"
-              value={newAllergen}
-              onChangeText={setNewAllergen}
-              onSubmitEditing={addAllergen}
-            />
+                          <TextInput
+                style={styles.tagInput}
+                placeholder="Tambah alergen"
+                value={newAllergen}
+                onChangeText={setNewAllergen}
+                onSubmitEditing={addAllergen}
+              />
             <TouchableOpacity style={styles.addButton} onPress={addAllergen}>
               <Ionicons name="add" size={20} color="#007AFF" />
             </TouchableOpacity>
@@ -571,7 +571,7 @@ export default function AdminFoodFormScreen() {
         {/* Availability */}
         <View style={styles.section}>
           <View style={styles.switchContainer}>
-            <Text style={styles.label}>Available</Text>
+            <Text style={styles.label}>Tersedia</Text>
             <Switch
               value={formData.isAvailable}
               onValueChange={(value) => handleInputChange('isAvailable', value)}
@@ -580,8 +580,8 @@ export default function AdminFoodFormScreen() {
           </View>
           <Text style={styles.switchDescription}>
             {formData.isAvailable 
-              ? 'Food is available for ordering' 
-              : 'Food is temporarily unavailable'
+              ? 'Makanan tersedia untuk tempahan' 
+              : 'Makanan tidak tersedia buat sementara'
             }
           </Text>
         </View>
@@ -589,7 +589,7 @@ export default function AdminFoodFormScreen() {
         {/* Active Status */}
         <View style={styles.section}>
           <View style={styles.switchContainer}>
-            <Text style={styles.label}>Active Status</Text>
+            <Text style={styles.label}>Status Aktif</Text>
             <Switch
               value={formData.isActive}
               onValueChange={(value) => handleInputChange('isActive', value)}
@@ -598,8 +598,8 @@ export default function AdminFoodFormScreen() {
           </View>
           <Text style={styles.switchDescription}>
             {formData.isActive 
-              ? 'Food is visible to customers' 
-              : 'Food is hidden from customers'
+              ? 'Makanan kelihatan kepada pelanggan' 
+              : 'Makanan disembunyikan dari pelanggan'
             }
           </Text>
         </View>
