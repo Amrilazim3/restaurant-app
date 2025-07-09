@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import {
   StyleSheet,
   ScrollView,
@@ -12,7 +12,7 @@ import {
   Platform,
   Image,
 } from 'react-native';
-import { router, useLocalSearchParams } from 'expo-router';
+import { router, useLocalSearchParams, useFocusEffect } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { Text, View } from '@/components/Themed';
 import { menuService, Food, Menu } from '@/services/menuService';
@@ -35,9 +35,12 @@ export default function AdminFoodsScreen() {
   const [bulkMode, setBulkMode] = useState(false);
   const [sortBy, setSortBy] = useState<'name' | 'price' | 'updated'>('name');
 
-  useEffect(() => {
-    loadData();
-  }, []);
+  // Refetch data when screen comes into focus
+  useFocusEffect(
+    useCallback(() => {
+      loadData();
+    }, [])
+  );
 
   useEffect(() => {
     filterFoods();
@@ -87,12 +90,16 @@ export default function AdminFoodsScreen() {
 
     // Filter by active status
     if (!showInactive) {
-      filtered = filtered.filter(food => food.isActive);
+      filtered = filtered.filter(food => food.isActive === true);
+    } else {
+      filtered = filtered.filter(food => food.isActive === false);
     }
 
     // Filter by availability
     if (!showUnavailable) {
-      filtered = filtered.filter(food => food.isAvailable);
+      filtered = filtered.filter(food => food.isAvailable === true);
+    } else {
+      filtered = filtered.filter(food => food.isAvailable === false);
     }
 
     // Sort foods
@@ -176,26 +183,6 @@ export default function AdminFoodsScreen() {
     );
   };
 
-  const handleToggleActive = async (food: Food) => {
-    try {
-      await menuService.updateFood(food.id, { isActive: !food.isActive });
-      loadData();
-    } catch (error) {
-      console.error('Error toggling food status:', error);
-      Alert.alert('Error', 'Failed to update food status. Please try again.');
-    }
-  };
-
-  const handleToggleAvailable = async (food: Food) => {
-    try {
-      await menuService.updateFood(food.id, { isAvailable: !food.isAvailable });
-      loadData();
-    } catch (error) {
-      console.error('Error toggling food availability:', error);
-      Alert.alert('Error', 'Failed to update food availability. Please try again.');
-    }
-  };
-
   const handleFoodPress = (food: Food) => {
     if (bulkMode) {
       toggleFoodSelection(food.id);
@@ -207,8 +194,6 @@ export default function AdminFoodsScreen() {
   const showFoodOptions = (food: Food) => {
     const options = [
       'Edit Food',
-      food.isActive ? 'Deactivate' : 'Activate',
-      food.isAvailable ? 'Mark Unavailable' : 'Mark Available',
       'Delete Food',
       'Cancel'
     ];
@@ -226,12 +211,6 @@ export default function AdminFoodsScreen() {
               handleEditFood(food);
               break;
             case 1:
-              handleToggleActive(food);
-              break;
-            case 2:
-              handleToggleAvailable(food);
-              break;
-            case 3:
               handleDeleteFood(food);
               break;
           }
@@ -240,8 +219,6 @@ export default function AdminFoodsScreen() {
     } else {
       Alert.alert('Food Options', 'Choose an action:', [
         { text: 'Edit Food', onPress: () => handleEditFood(food) },
-        { text: food.isActive ? 'Deactivate' : 'Activate', onPress: () => handleToggleActive(food) },
-        { text: food.isAvailable ? 'Mark Unavailable' : 'Mark Available', onPress: () => handleToggleAvailable(food) },
         { text: 'Delete Food', style: 'destructive', onPress: () => handleDeleteFood(food) },
         { text: 'Cancel', style: 'cancel' },
       ]);
@@ -329,7 +306,7 @@ export default function AdminFoodsScreen() {
           
           <View style={styles.foodInfo}>
             <Text style={styles.foodName}>{food.name}</Text>
-            <Text style={styles.foodPrice}>${food.price.toFixed(2)}</Text>
+            <Text style={styles.foodPrice}>RM{food.price.toFixed(2)}</Text>
             <Text style={styles.foodDescription} numberOfLines={2}>
               {food.description}
             </Text>

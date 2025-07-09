@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import {
   StyleSheet,
   ScrollView,
@@ -11,7 +11,7 @@ import {
   ActionSheetIOS,
   Platform,
 } from 'react-native';
-import { router } from 'expo-router';
+import { router, useFocusEffect } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { Text, View } from '@/components/Themed';
 import { menuService, Menu } from '@/services/menuService';
@@ -36,9 +36,12 @@ export default function AdminMenusScreen() {
   const [selectedMenus, setSelectedMenus] = useState<string[]>([]);
   const [bulkMode, setBulkMode] = useState(false);
 
-  useEffect(() => {
-    loadMenus();
-  }, []);
+  // Refetch data when screen comes into focus
+  useFocusEffect(
+    useCallback(() => {
+      loadMenus();
+    }, [])
+  );
 
   useEffect(() => {
     filterMenus();
@@ -84,7 +87,9 @@ export default function AdminMenusScreen() {
 
     // Filter by active status
     if (!showInactive) {
-      filtered = filtered.filter(menu => menu.isActive);
+      filtered = filtered.filter(menu => menu.isActive === true);
+    } else {
+      filtered = filtered.filter(menu => menu.isActive === false);
     }
 
     setFilteredMenus(filtered);
@@ -128,16 +133,6 @@ export default function AdminMenusScreen() {
     );
   };
 
-  const handleToggleActive = async (menu: Menu) => {
-    try {
-      await menuService.updateMenu(menu.id, { isActive: !menu.isActive });
-      loadMenus();
-    } catch (error) {
-      console.error('Error toggling menu status:', error);
-      Alert.alert('Error', 'Failed to update menu status. Please try again.');
-    }
-  };
-
   const handleMenuPress = (menu: Menu) => {
     if (bulkMode) {
       toggleMenuSelection(menu.id);
@@ -149,8 +144,6 @@ export default function AdminMenusScreen() {
   const showMenuOptions = (menu: Menu) => {
     const options = [
       'Edit Menu',
-      'Manage Foods',
-      menu.isActive ? 'Deactivate' : 'Activate',
       'Delete Menu',
       'Cancel'
     ];
@@ -168,12 +161,6 @@ export default function AdminMenusScreen() {
               handleEditMenu(menu);
               break;
             case 1:
-              router.push(`/adminFoods?menuId=${menu.id}`);
-              break;
-            case 2:
-              handleToggleActive(menu);
-              break;
-            case 3:
               handleDeleteMenu(menu);
               break;
           }
@@ -182,8 +169,6 @@ export default function AdminMenusScreen() {
     } else {
       Alert.alert('Menu Options', 'Choose an action:', [
         { text: 'Edit Menu', onPress: () => handleEditMenu(menu) },
-        { text: 'Manage Foods', onPress: () => router.push(`/adminFoods?menuId=${menu.id}`) },
-        { text: menu.isActive ? 'Deactivate' : 'Activate', onPress: () => handleToggleActive(menu) },
         { text: 'Delete Menu', style: 'destructive', onPress: () => handleDeleteMenu(menu) },
         { text: 'Cancel', style: 'cancel' },
       ]);
