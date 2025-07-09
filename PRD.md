@@ -318,15 +318,15 @@ Order Collection:
 - [x] Shopping cart functionality
 - [x] Basic admin panel
 
-#### Phase 2.5: Admin Content Management (Week 4-5)
-- [ ] Admin menu management interface
-- [ ] Admin food management interface
-- [ ] Create/Edit menu functionality
-- [ ] Create/Edit food functionality
-- [ ] Delete menu/food functionality (soft delete)
-- [ ] Image upload for menus and foods
-- [ ] Menu and food availability toggles
-- [ ] Admin data validation and error handling
+#### Phase 2.5: Admin Content Management (Week 4-5) ✅ COMPLETED
+- [x] Admin menu management interface
+- [x] Admin food management interface
+- [x] Create/Edit menu functionality
+- [x] Create/Edit food functionality
+- [x] Delete menu/food functionality (soft delete)
+- [x] Image upload for menus and foods
+- [x] Menu and food availability toggles
+- [x] Admin data validation and error handling
 
 #### Phase 3: Ordering System (Week 6-7)
 - [ ] Order placement

@@ -86,6 +86,38 @@ function RootLayoutNav() {
             presentation: 'card'
           }} 
         />
+        <Stack.Screen 
+          name="adminMenus" 
+          options={{ 
+            title: 'Menu Management',
+            headerShown: false,
+            presentation: 'card'
+          }} 
+        />
+        <Stack.Screen 
+          name="adminMenuForm" 
+          options={{ 
+            title: 'Menu Form',
+            headerShown: false,
+            presentation: 'modal'
+          }} 
+        />
+        <Stack.Screen 
+          name="adminFoods" 
+          options={{ 
+            title: 'Food Management',
+            headerShown: false,
+            presentation: 'card'
+          }} 
+        />
+        <Stack.Screen 
+          name="adminFoodForm" 
+          options={{ 
+            title: 'Food Form',
+            headerShown: false,
+            presentation: 'modal'
+          }} 
+        />
       </Stack>
     </ThemeProvider>
   );

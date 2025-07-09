@@ -43,7 +43,25 @@ export default function ProfileScreen() {
   };
 
   const handleAdminAction = (action: string) => {
-    Alert.alert('Admin Action', `${action} feature coming soon!`);
+    switch (action) {
+      case 'Manage Menus':
+        router.push('/adminMenus');
+        break;
+      case 'Manage Foods':
+        router.push('/adminFoods');
+        break;
+      case 'View Orders':
+        Alert.alert('Admin Action', 'Order management feature coming soon!');
+        break;
+      case 'User Management':
+        Alert.alert('Admin Action', 'User management feature coming soon!');
+        break;
+      case 'Analytics':
+        Alert.alert('Admin Action', 'Analytics feature coming soon!');
+        break;
+      default:
+        Alert.alert('Admin Action', `${action} feature coming soon!`);
+    }
   };
 
   return (
