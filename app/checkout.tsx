@@ -54,7 +54,18 @@ export default function CheckoutScreen() {
       if (userProfile.phoneNumber) {
         setContactNumber(userProfile.phoneNumber);
       }
-      // Could pre-fill address from profile if stored
+      
+      // Pre-fill address from profile if available
+      if (userProfile.address) {
+        setDeliveryAddress({
+          street: userProfile.address.street || '',
+          city: userProfile.address.city || '',
+          state: userProfile.address.state || '',
+          postalCode: userProfile.address.postalCode || '',
+          country: userProfile.address.country || 'Malaysia',
+          specialInstructions: ''
+        });
+      }
     }
   }, [userProfile]);
 
@@ -123,7 +134,7 @@ export default function CheckoutScreen() {
         deliveryAddress,
         contactNumber,
         paymentMethod,
-        guestInfo: !user ? guestInfo : null,
+        guestInfo: !user ? guestInfo : undefined,
         notes: orderNotes
       };
 
