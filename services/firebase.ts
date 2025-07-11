@@ -6,12 +6,13 @@ import { getStorage } from 'firebase/storage';
 // Your Firebase configuration
 // Updated with actual values from google-services.json
 const firebaseConfig = {
-  apiKey: "AIzaSyBYoMiysGPXiaqT-8fVUJ5_zY542qXUwOE",
+  apiKey: "AIzaSyC4rcRMN91L6otxTqYbi5cmffCK4LcjV9w",
   authDomain: "retaurant-block-twenty-9.firebaseapp.com",
   projectId: "retaurant-block-twenty-9",
   storageBucket: "retaurant-block-twenty-9.firebasestorage.app",
   messagingSenderId: "721539899518",
-  appId: "1:721539899518:android:44bcef895822fd299bf82f"
+  appId: "1:721539899518:web:842dd60eb460ef199bf82f",
+  measurementId: "G-MT9G4D64YL"
 };
 
 // Initialize Firebase
