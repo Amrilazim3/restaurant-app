@@ -1,5 +1,14 @@
-import auth, { FirebaseAuthTypes } from '@react-native-firebase/auth';
-import firestore from '@react-native-firebase/firestore';
+import { 
+  createUserWithEmailAndPassword, 
+  signInWithEmailAndPassword, 
+  signOut, 
+  User,
+  updatePassword,
+  EmailAuthProvider,
+  reauthenticateWithCredential
+} from 'firebase/auth';
+import { doc, setDoc, getDoc, updateDoc } from 'firebase/firestore';
+import { auth, db } from './firebase';
 
 export interface UserProfile {
   uid: string;
@@ -35,7 +44,7 @@ export const authService = {
         }
       }
 
-      const userCredential = await auth().createUserWithEmailAndPassword(email, password);
+      const userCredential = await createUserWithEmailAndPassword(auth, email, password);
       const user = userCredential.user;
       
       // Create user profile in Firestore
@@ -47,7 +56,7 @@ export const authService = {
         createdAt: new Date()
       };
       
-      await firestore().collection('users').doc(user.uid).set(userProfile);
+      await setDoc(doc(db, 'users', user.uid), userProfile);
       
       return userProfile;
     } catch (error) {
@@ -58,13 +67,13 @@ export const authService = {
   // Login user
   async login(email: string, password: string): Promise<UserProfile> {
     try {
-      const userCredential = await auth().signInWithEmailAndPassword(email, password);
+      const userCredential = await signInWithEmailAndPassword(auth, email, password);
       const user = userCredential.user;
       
       // Get user profile from Firestore
-      const userDoc = await firestore().collection('users').doc(user.uid).get();
+      const userDoc = await getDoc(doc(db, 'users', user.uid));
       
-      if (userDoc.exists) {
+      if (userDoc.exists()) {
         return userDoc.data() as UserProfile;
       } else {
         throw new Error('User profile not found');
@@ -77,7 +86,7 @@ export const authService = {
   // Logout user
   async logout(): Promise<void> {
     try {
-      await auth().signOut();
+      await signOut(auth);
     } catch (error) {
       throw error;
     }
@@ -86,8 +95,8 @@ export const authService = {
   // Get user profile
   async getUserProfile(uid: string): Promise<UserProfile | null> {
     try {
-      const userDoc = await firestore().collection('users').doc(uid).get();
-      return userDoc.exists ? (userDoc.data() as UserProfile) : null;
+      const userDoc = await getDoc(doc(db, 'users', uid));
+      return userDoc.exists() ? (userDoc.data() as UserProfile) : null;
     } catch (error) {
       console.error('Error getting user profile:', error);
       return null;
@@ -102,7 +111,7 @@ export const authService = {
         updatedAt: new Date()
       };
       
-      await firestore().collection('users').doc(uid).update(updatedData);
+      await updateDoc(doc(db, 'users', uid), updatedData);
       
       // Get updated profile
       const updatedProfile = await this.getUserProfile(uid);
@@ -119,17 +128,17 @@ export const authService = {
   // Change password
   async changePassword(currentPassword: string, newPassword: string): Promise<void> {
     try {
-      const user = auth().currentUser;
+      const user = auth.currentUser;
       if (!user || !user.email) {
         throw new Error('No authenticated user found');
       }
 
       // Re-authenticate user
-      const credential = auth.EmailAuthProvider.credential(user.email, currentPassword);
-      await user.reauthenticateWithCredential(credential);
+      const credential = EmailAuthProvider.credential(user.email, currentPassword);
+      await reauthenticateWithCredential(user, credential);
 
       // Update password
-      await user.updatePassword(newPassword);
+      await updatePassword(user, newPassword);
     } catch (error) {
       throw error;
     }
