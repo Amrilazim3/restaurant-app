@@ -74,8 +74,8 @@ export default function CartScreen() {
       return;
     }
     
-    // TODO: Implement checkout flow
-    Alert.alert('Checkout', 'Fungsi checkout akan dilaksanakan tidak lama lagi!');
+    // Navigate to checkout screen
+    router.push('/checkout');
   };
 
   const renderCartItem = (item: CartItem) => (
