@@ -1,30 +1,15 @@
-import { initializeApp } from 'firebase/app';
-import { getAuth } from 'firebase/auth';
-import { getFirestore } from 'firebase/firestore';
-import { getStorage } from 'firebase/storage';
+// React Native Firebase configuration
+// For React Native Firebase, configuration is handled through native config files
+// google-services.json (Android) and GoogleService-Info.plist (iOS)
 
-// Your Firebase configuration
-// Updated with actual values from google-services.json
-const firebaseConfig = {
-  apiKey: "AIzaSyBYoMiysGPXiaqT-8fVUJ5_zY542qXUwOE",
-  authDomain: "retaurant-block-twenty-9.firebaseapp.com",
-  projectId: "retaurant-block-twenty-9",
-  storageBucket: "retaurant-block-twenty-9.firebasestorage.app",
-  messagingSenderId: "721539899518",
-  appId: "1:721539899518:android:44bcef895822fd299bf82f"
-};
+import auth from '@react-native-firebase/auth';
+import firestore from '@react-native-firebase/firestore';
+import storage from '@react-native-firebase/storage';
 
-// Initialize Firebase
-const app = initializeApp(firebaseConfig);
+// Export Firebase services
+// No need to initialize Firebase app manually - it's done automatically through native config files
+export { auth, firestore, storage };
 
-// Initialize Auth
-const auth = getAuth(app);
-
-// Initialize Firestore
-const db = getFirestore(app);
-
-// Initialize Storage
-const storage = getStorage(app);
-
-export { auth, db, storage };
-export default app; 
+// For backward compatibility, export as named exports matching the old structure
+export const db = firestore();
+export { auth as default }; 
