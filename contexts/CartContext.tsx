@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { Food } from '@/services/menuService';
+import { Food } from '@/types/menu';
 
 export interface CartItem {
   id: string;

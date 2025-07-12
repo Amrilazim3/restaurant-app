@@ -12,7 +12,8 @@ import {
   RefreshControl,
 } from 'react-native';
 import { router } from 'expo-router';
-import { menuService, Menu, Food } from '@/services/menuService';
+import { menuService } from '@/services/menuService';
+import { Menu, Food } from '@/types/menu';
 import { useCart } from '@/contexts/CartContext';
 
 export default function MenuScreen() {

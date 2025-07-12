@@ -13,7 +13,7 @@ import {
 } from 'react-native';
 import { router } from 'expo-router';
 import { useAuth } from '@/contexts/AuthContext';
-import { UserAddress } from '@/services/authService';
+import { UserAddress } from '@/types/auth';
 
 export default function EditProfileScreen() {
   const { userProfile, updateProfile } = useAuth();

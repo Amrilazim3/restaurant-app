@@ -14,7 +14,8 @@ import {
 import { router, useFocusEffect } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { Text, View } from '@/components/Themed';
-import { menuService, Menu } from '@/services/menuService';
+import { menuService } from '@/services/menuService';
+import { Menu } from '@/types/menu';
 import { imageService } from '@/services/imageService';
 
 interface MenuWithStats extends Menu {

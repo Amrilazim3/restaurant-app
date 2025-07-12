@@ -11,7 +11,8 @@ import {
   TextInput,
 } from 'react-native';
 import { router, useLocalSearchParams } from 'expo-router';
-import { menuService, Food } from '@/services/menuService';
+import { menuService } from '@/services/menuService';
+import { Food } from '@/types/menu';
 import { useCart } from '@/contexts/CartContext';
 
 export default function FoodDetailScreen() {

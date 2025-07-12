@@ -9,31 +9,7 @@ import {
 } from 'firebase/auth';
 import { doc, setDoc, getDoc, updateDoc } from 'firebase/firestore';
 import { auth, db } from './firebase';
-
-export interface UserAddress {
-  street?: string;
-  city?: string;
-  state?: string;
-  postalCode?: string;
-  country?: string;
-}
-
-export interface UserProfile {
-  uid: string;
-  email: string;
-  role: 'admin' | 'user';
-  displayName?: string;
-  phoneNumber?: string;
-  address?: UserAddress;
-  createdAt: Date;
-  updatedAt?: Date;
-}
-
-export interface ProfileUpdateData {
-  displayName?: string;
-  phoneNumber?: string | null;
-  address?: UserAddress | null;
-}
+import { UserProfile, UserAddress, ProfileUpdateData } from '@/types/auth';
 
 export const authService = {
   // Register a new user

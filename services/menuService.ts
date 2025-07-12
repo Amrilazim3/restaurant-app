@@ -12,31 +12,7 @@ import {
   Timestamp 
 } from 'firebase/firestore';
 import { db } from './firebase';
-
-export interface Menu {
-  id: string;
-  name: string;
-  description: string;
-  image?: string;
-  isActive: boolean;
-  createdAt: Date;
-  updatedAt?: Date;
-}
-
-export interface Food {
-  id: string;
-  menuId: string;
-  name: string;
-  description: string;
-  price: number;
-  image?: string;
-  ingredients: string[];
-  allergens: string[];
-  isAvailable: boolean;
-  isActive: boolean;
-  createdAt: Date;
-  updatedAt?: Date;
-}
+import { Menu, Food } from '@/types/menu';
 
 export const menuService = {
   // Get all active menus

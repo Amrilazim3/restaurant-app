@@ -1,17 +1,6 @@
 import * as ImagePicker from 'expo-image-picker';
 import { manipulateAsync, SaveFormat } from 'expo-image-manipulator';
-
-export interface ImageUploadResult {
-  url: string;
-  path: string;
-}
-
-export interface ImageUploadOptions {
-  maxWidth?: number;
-  maxHeight?: number;
-  quality?: number;
-  format?: SaveFormat;
-}
+import { ImageUploadResult, ImageUploadOptions } from '@/types/image';
 
 // Predefined placeholder images for different categories
 const PLACEHOLDER_IMAGES = {
