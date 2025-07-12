@@ -51,7 +51,7 @@ export default function ProfileScreen() {
         router.push('/adminFoods');
         break;
       case 'View Orders':
-        Alert.alert('Tindakan Admin', 'Fungsi pengurusan pesanan akan datang tidak lama lagi!');
+        router.push('/adminOrders');
         break;
       case 'User Management':
         Alert.alert('Tindakan Admin', 'Fungsi pengurusan pengguna akan datang tidak lama lagi!');
@@ -89,7 +89,11 @@ export default function ProfileScreen() {
 
         <View style={styles.profileItem}>
           <Text style={styles.profileLabel}>Alamat</Text>
-          <Text style={styles.profileValue}>{userProfile?.address || 'Tidak ditetapkan'}</Text>
+          <Text style={styles.profileValue}>
+            {userProfile?.address 
+              ? `${userProfile.address.street || ''}, ${userProfile.address.city || ''}, ${userProfile.address.state || ''} ${userProfile.address.postalCode || ''}`.trim().replace(/^,\s*/, '').replace(/,\s*$/, '') 
+              : 'Tidak ditetapkan'}
+          </Text>
         </View>
 
         <View style={styles.profileItem}>

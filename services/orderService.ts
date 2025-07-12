@@ -8,7 +8,9 @@ import {
   query, 
   where, 
   orderBy, 
-  Timestamp 
+  Timestamp,
+  onSnapshot,
+  DocumentData 
 } from 'firebase/firestore';
 import { db } from './firebase';
 import { 
@@ -275,6 +277,92 @@ class OrderService {
       console.error('Error fetching orders by status:', error);
       throw new Error('Failed to fetch orders. Please try again.');
     }
+  }
+
+  /**
+   * Subscribe to user orders for real-time updates
+   */
+  subscribeToUserOrders(userId: string, callback: (orders: Order[]) => void): () => void {
+    const q = query(
+      collection(db, ORDERS_COLLECTION),
+      where('userId', '==', userId),
+      orderBy('createdAt', 'desc')
+    );
+
+    const unsubscribe = onSnapshot(q, (snapshot) => {
+      const orders: Order[] = [];
+      snapshot.forEach((doc) => {
+        const data = doc.data();
+        orders.push({
+          id: doc.id,
+          ...data,
+          createdAt: data.createdAt.toDate(),
+          updatedAt: data.updatedAt.toDate(),
+          estimatedDeliveryTime: data.estimatedDeliveryTime?.toDate()
+        } as Order);
+      });
+      callback(orders);
+    }, (error) => {
+      console.error('Error subscribing to user orders:', error);
+    });
+
+    return unsubscribe;
+  }
+
+  /**
+   * Subscribe to all orders for admin real-time updates
+   */
+  subscribeToAllOrders(callback: (orders: Order[]) => void): () => void {
+    const q = query(
+      collection(db, ORDERS_COLLECTION),
+      orderBy('createdAt', 'desc')
+    );
+
+    const unsubscribe = onSnapshot(q, (snapshot) => {
+      const orders: Order[] = [];
+      snapshot.forEach((doc) => {
+        const data = doc.data();
+        orders.push({
+          id: doc.id,
+          ...data,
+          createdAt: data.createdAt.toDate(),
+          updatedAt: data.updatedAt.toDate(),
+          estimatedDeliveryTime: data.estimatedDeliveryTime?.toDate()
+        } as Order);
+      });
+      callback(orders);
+    }, (error) => {
+      console.error('Error subscribing to all orders:', error);
+    });
+
+    return unsubscribe;
+  }
+
+  /**
+   * Subscribe to a specific order for real-time updates
+   */
+  subscribeToOrder(orderId: string, callback: (order: Order | null) => void): () => void {
+    const orderRef = doc(db, ORDERS_COLLECTION, orderId);
+
+    const unsubscribe = onSnapshot(orderRef, (doc) => {
+      if (doc.exists()) {
+        const data = doc.data();
+        const order: Order = {
+          id: doc.id,
+          ...data,
+          createdAt: data.createdAt.toDate(),
+          updatedAt: data.updatedAt.toDate(),
+          estimatedDeliveryTime: data.estimatedDeliveryTime?.toDate()
+        } as Order;
+        callback(order);
+      } else {
+        callback(null);
+      }
+    }, (error) => {
+      console.error('Error subscribing to order:', error);
+    });
+
+    return unsubscribe;
   }
 }
 
