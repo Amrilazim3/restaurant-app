@@ -157,7 +157,7 @@ function RootLayoutNav() {
           name="guestMenu" 
           options={{ 
             title: 'Menu Kami',
-            headerShown: false,
+            headerShown: true,
             presentation: 'card'
           }} 
         />

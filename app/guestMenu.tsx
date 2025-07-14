@@ -48,8 +48,8 @@ export default function GuestMenuScreen() {
   const loadFoods = async (menu: Menu) => {
     try {
       setLoading(true);
-      const menuFoods = await menuService.getFoodsByMenu(menu.id);
-      const availableFoods = menuFoods.filter(food => food.isAvailable);
+      const menuFoods = await menuService.getFoodsByMenuId(menu.id);
+      const availableFoods = menuFoods.filter((food: Food) => food.isAvailable);
       setFoods(availableFoods);
       setSelectedMenu(menu);
       setView('foods');
@@ -98,12 +98,12 @@ export default function GuestMenuScreen() {
     router.push('/(auth)/register');
   };
 
-  const filteredItems = view === 'menus' 
-    ? menus.filter(menu => 
+  const filteredItems: Menu[] | Food[] = view === 'menus' 
+    ? menus.filter((menu: Menu) => 
         menu.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
         menu.description.toLowerCase().includes(searchQuery.toLowerCase())
       )
-    : foods.filter(food =>
+    : foods.filter((food: Food) =>
         food.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
         food.description.toLowerCase().includes(searchQuery.toLowerCase())
       );
@@ -235,8 +235,8 @@ export default function GuestMenuScreen() {
         ) : (
           <View style={styles.grid}>
             {view === 'menus' 
-              ? filteredItems.map((menu) => renderMenuCard(menu as Menu))
-              : filteredItems.map((food) => renderFoodCard(food as Food))
+              ? (filteredItems as Menu[]).map((menu: Menu) => renderMenuCard(menu))
+              : (filteredItems as Food[]).map((food: Food) => renderFoodCard(food))
             }
           </View>
         )}

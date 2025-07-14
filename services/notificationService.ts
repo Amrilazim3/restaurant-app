@@ -11,7 +11,7 @@ Notifications.setNotificationHandler({
     shouldShowAlert: true,
     shouldPlaySound: true,
     shouldSetBadge: false,
-  }),
+  }) as any,
 });
 
 export interface NotificationData {
@@ -24,15 +24,65 @@ export interface NotificationData {
 
 class NotificationService {
   private expoPushToken: string | null = null;
+  private isExpoGo: boolean = false;
+  private initialized: boolean = false;
+
+  constructor() {
+    // Check if running in Expo Go
+    this.isExpoGo = Constants.appOwnership === 'expo';
+  }
 
   /**
    * Initialize notification service
    */
   async initialize(): Promise<void> {
+    if (this.initialized) return;
+    
     try {
-      await this.registerForPushNotificationsAsync();
+      if (this.isExpoGo) {
+        console.log('Running in Expo Go - Push notifications disabled. Use development build for full functionality.');
+        // Only setup local notifications for Expo Go
+        await this.setupLocalNotifications();
+      } else {
+        await this.registerForPushNotificationsAsync();
+      }
+      this.initialized = true;
     } catch (error) {
       console.error('Failed to initialize notifications:', error);
+      // Initialize with local notifications only as fallback
+      await this.setupLocalNotifications();
+      this.initialized = true;
+    }
+  }
+
+  /**
+   * Setup local notifications only (for Expo Go)
+   */
+  private async setupLocalNotifications(): Promise<void> {
+    try {
+      if (Platform.OS === 'android') {
+        await Notifications.setNotificationChannelAsync('default', {
+          name: 'default',
+          importance: Notifications.AndroidImportance.MAX,
+          vibrationPattern: [0, 250, 250, 250],
+          lightColor: '#FF231F7C',
+        });
+      }
+
+      // Request permissions for local notifications
+      const { status: existingStatus } = await Notifications.getPermissionsAsync();
+      let finalStatus = existingStatus;
+      
+      if (existingStatus !== 'granted') {
+        const { status } = await Notifications.requestPermissionsAsync();
+        finalStatus = status;
+      }
+      
+      if (finalStatus !== 'granted') {
+        console.log('Notification permissions not granted');
+      }
+    } catch (error) {
+      console.error('Failed to setup local notifications:', error);
     }
   }
 
@@ -69,7 +119,8 @@ class NotificationService {
         const projectId = Constants.expoConfig?.extra?.eas?.projectId ?? Constants.easConfig?.projectId;
         
         if (!projectId) {
-          throw new Error('Project ID not found');
+          console.warn('Project ID not found - Push notifications will not work. Please configure Firebase in your expo config.');
+          return null;
         }
 
         token = (await Notifications.getExpoPushTokenAsync({ projectId })).data;
@@ -94,6 +145,13 @@ class NotificationService {
   }
 
   /**
+   * Check if push notifications are available
+   */
+  isPushNotificationAvailable(): boolean {
+    return !this.isExpoGo && this.expoPushToken !== null;
+  }
+
+  /**
    * Send local notification
    */
   async sendLocalNotification(data: NotificationData): Promise<void> {
@@ -103,7 +161,6 @@ class NotificationService {
           title: data.title,
           body: data.message,
           data: data.data,
-          sound: 'default',
         },
         trigger: null, // Show immediately
       });
@@ -113,22 +170,28 @@ class NotificationService {
   }
 
   /**
-   * Send push notification via Expo Push API
+   * Send push notification (only works in development builds)
    */
   async sendPushNotification(
     expoPushToken: string,
     data: NotificationData
   ): Promise<void> {
-    const message = {
-      to: expoPushToken,
-      sound: 'default',
-      title: data.title,
-      body: data.message,
-      data: data.data,
-    };
+    if (this.isExpoGo) {
+      console.log('Push notifications not available in Expo Go - using local notification instead');
+      await this.sendLocalNotification(data);
+      return;
+    }
 
     try {
-      await fetch('https://exp.host/--/api/v2/push/send', {
+      const message = {
+        to: expoPushToken,
+        sound: 'default',
+        title: data.title,
+        body: data.message,
+        data: data.data,
+      };
+
+      const response = await fetch('https://exp.host/--/api/v2/push/send', {
         method: 'POST',
         headers: {
           Accept: 'application/json',
@@ -137,8 +200,17 @@ class NotificationService {
         },
         body: JSON.stringify(message),
       });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const result = await response.json();
+      console.log('Push notification sent:', result);
     } catch (error) {
       console.error('Error sending push notification:', error);
+      // Fallback to local notification
+      await this.sendLocalNotification(data);
     }
   }
 

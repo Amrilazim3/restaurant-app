@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useEffect, useState, ReactNode } from 'react';
+import React, { createContext, useContext, useEffect, useState, ReactNode, useCallback, useRef } from 'react';
 import * as Notifications from 'expo-notifications';
 import { router } from 'expo-router';
 import { notificationService, NotificationData } from '@/services/notificationService';
@@ -35,62 +35,87 @@ export const NotificationProvider: React.FC<NotificationProviderProps> = ({ chil
   const [isInitialized, setIsInitialized] = useState(false);
   const [expoPushToken, setExpoPushToken] = useState<string | null>(null);
   const { user, userProfile } = useAuth();
+  const cleanupRef = useRef<(() => void) | null>(null);
 
+  // Initialize notifications only once
   useEffect(() => {
-    initializeNotifications();
-  }, []);
-
-  useEffect(() => {
-    if (user) {
-      setupNotificationListeners();
-    }
-  }, [user]);
-
-  const initializeNotifications = async () => {
-    try {
-      await notificationService.initialize();
-      const token = notificationService.getExpoPushToken();
-      setExpoPushToken(token);
-      setIsInitialized(true);
-    } catch (error) {
-      console.error('Failed to initialize notifications:', error);
-    }
-  };
-
-  const setupNotificationListeners = () => {
-    const { notificationListener, responseListener } = notificationService.setupNotificationListeners();
-
-    // Handle received notifications
-    const notificationReceivedListener = Notifications.addNotificationReceivedListener((notification: Notifications.Notification) => {
-      const data = notification.request.content.data;
-      const newNotification: NotificationData = {
-        orderId: data?.orderId,
-        type: data?.type || 'general',
-        title: notification.request.content.title || 'Notifikasi',
-        message: notification.request.content.body || '',
-        data: data,
-      };
-
-      setNotifications(prev => [newNotification, ...prev]);
-      setUnreadCount(prev => prev + 1);
-    });
-
-    // Handle notification responses (when user taps notification)
-    const notificationResponseListener = Notifications.addNotificationResponseReceivedListener((response: Notifications.NotificationResponse) => {
-      const data = response.notification.request.content.data;
-      handleNotificationPress(data);
-    });
-
-    // Cleanup function
-    return () => {
-      notificationListener.remove();
-      responseListener.remove();
-      notificationReceivedListener.remove();
-      notificationResponseListener.remove();
+    let isMounted = true;
+    
+    const initializeNotifications = async () => {
+      try {
+        await notificationService.initialize();
+        if (isMounted) {
+          const token = notificationService.getExpoPushToken();
+          setExpoPushToken(token);
+          setIsInitialized(true);
+        }
+      } catch (error) {
+        console.error('Failed to initialize notifications:', error);
+        if (isMounted) {
+          setIsInitialized(true); // Still mark as initialized to prevent retries
+        }
+      }
     };
-  };
 
-  const handleNotificationPress = (data: any) => {
+    initializeNotifications();
+
+    return () => {
+      isMounted = false;
+    };
+  }, []); // Empty dependency array - only run once
+
+  // Setup notification listeners when user is available
+  useEffect(() => {
+    if (!user || !isInitialized) return;
+
+    const setupNotificationListeners = () => {
+      try {
+        const { notificationListener, responseListener } = notificationService.setupNotificationListeners();
+
+        // Handle received notifications
+        const notificationReceivedListener = Notifications.addNotificationReceivedListener((notification: Notifications.Notification) => {
+          const data = notification.request.content.data;
+          const newNotification: NotificationData = {
+            orderId: data?.orderId as string,
+            type: (data?.type as 'order_status' | 'payment_confirmed' | 'new_order' | 'general') || 'general',
+            title: notification.request.content.title || 'Notifikasi',
+            message: notification.request.content.body || '',
+            data: data,
+          };
+
+          setNotifications(prev => [newNotification, ...prev]);
+          setUnreadCount(prev => prev + 1);
+        });
+
+        // Handle notification responses (when user taps notification)
+        const notificationResponseListener = Notifications.addNotificationResponseReceivedListener((response: Notifications.NotificationResponse) => {
+          const data = response.notification.request.content.data;
+          handleNotificationPress(data);
+        });
+
+        // Cleanup function
+        return () => {
+          notificationListener?.remove();
+          responseListener?.remove();
+          notificationReceivedListener?.remove();
+          notificationResponseListener?.remove();
+        };
+      } catch (error) {
+        console.error('Error setting up notification listeners:', error);
+        return () => {}; // Return empty cleanup function
+      }
+    };
+
+    cleanupRef.current = setupNotificationListeners();
+
+    return () => {
+      if (cleanupRef.current) {
+        cleanupRef.current();
+      }
+    };
+  }, [user, isInitialized]); // Only depend on user and isInitialized
+
+  const handleNotificationPress = useCallback((data: any) => {
     try {
       if (data?.type === 'order_status' && data?.orderId) {
         // Navigate to order details
@@ -110,9 +135,9 @@ export const NotificationProvider: React.FC<NotificationProviderProps> = ({ chil
     } catch (error) {
       console.error('Error handling notification press:', error);
     }
-  };
+  }, [userProfile?.role]);
 
-  const markAsRead = (notificationId: string) => {
+  const markAsRead = useCallback((notificationId: string) => {
     setNotifications(prev => 
       prev.map(notification => 
         notification.orderId === notificationId 
@@ -121,31 +146,39 @@ export const NotificationProvider: React.FC<NotificationProviderProps> = ({ chil
       )
     );
     setUnreadCount(prev => Math.max(0, prev - 1));
-  };
+  }, []);
 
-  const markAllAsRead = () => {
+  const markAllAsRead = useCallback(() => {
     setNotifications(prev => 
       prev.map(notification => ({ ...notification, read: true }))
     );
     setUnreadCount(0);
-  };
+  }, []);
 
-  const clearNotifications = async () => {
-    await notificationService.clearAllNotifications();
-    setNotifications([]);
-    setUnreadCount(0);
-  };
+  const clearNotifications = useCallback(async () => {
+    try {
+      await notificationService.clearAllNotifications();
+      setNotifications([]);
+      setUnreadCount(0);
+    } catch (error) {
+      console.error('Error clearing notifications:', error);
+    }
+  }, []);
 
-  const sendTestNotification = async () => {
-    const testNotification: NotificationData = {
-      type: 'general',
-      title: 'Notifikasi Ujian',
-      message: 'Ini adalah notifikasi ujian untuk memastikan sistem berfungsi dengan baik.',
-      data: { type: 'test' },
-    };
-    
-    await notificationService.sendLocalNotification(testNotification);
-  };
+  const sendTestNotification = useCallback(async () => {
+    try {
+      const testNotification: NotificationData = {
+        type: 'general',
+        title: 'Notifikasi Ujian',
+        message: 'Ini adalah notifikasi ujian untuk memastikan sistem berfungsi dengan baik.',
+        data: { type: 'test' },
+      };
+      
+      await notificationService.sendLocalNotification(testNotification);
+    } catch (error) {
+      console.error('Error sending test notification:', error);
+    }
+  }, []);
 
   const value = {
     notifications,

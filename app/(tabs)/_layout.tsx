@@ -1,5 +1,5 @@
 import { Tabs } from 'expo-router';
-import React, { useEffect } from 'react';
+import React, { useEffect, useMemo } from 'react';
 import { View, Text, StyleSheet, ActivityIndicator } from 'react-native';
 import { router } from 'expo-router';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
@@ -37,7 +37,17 @@ export default function TabLayout() {
   const colorScheme = useColorScheme();
   const { user, loading } = useAuth();
   const { cartCount } = useCart();
-  const { unreadCount } = useNotification();
+  
+  // Get notification context - provide fallback if not available
+  let unreadCount = 0;
+  try {
+    if (user) {
+      const notificationContext = useNotification();
+      unreadCount = notificationContext.unreadCount;
+    }
+  } catch (error) {
+    console.error('Error accessing notification context:', error);
+  }
 
   // Removed automatic redirect to login - now handled by welcome screen
 
@@ -49,24 +59,16 @@ export default function TabLayout() {
     );
   }
 
-  // If no user, redirect to welcome screen
-  if (!user) {
-    router.replace('/');
-    return null;
-  }
-
   return (
     <Tabs
       screenOptions={{
         tabBarActiveTintColor: Colors[colorScheme ?? 'light'].tint,
-        // Disable the static render of the header on web
-        // to prevent a hydration error in React Navigation v6.
         headerShown: useClientOnlyValue(false, true),
       }}>
       <Tabs.Screen
         name="index"
         options={{
-          title: 'Utama',
+          title: 'Beranda',
           tabBarIcon: ({ color }) => <TabBarIcon name="home" color={color} />,
         }}
       />
@@ -80,9 +82,9 @@ export default function TabLayout() {
       <Tabs.Screen
         name="cart"
         options={{
-          title: 'Troli',
+          title: 'Keranjang',
           tabBarIcon: ({ color }) => (
-            <View style={styles.cartIconContainer}>
+            <View style={{ position: 'relative' }}>
               <TabBarIcon name="shopping-cart" color={color} />
               <CartBadge count={cartCount} />
             </View>
@@ -94,7 +96,7 @@ export default function TabLayout() {
         options={{
           title: 'Pesanan',
           tabBarIcon: ({ color }) => (
-            <View style={styles.cartIconContainer}>
+            <View style={{ position: 'relative' }}>
               <TabBarIcon name="list" color={color} />
               <NotificationBadge count={unreadCount} />
             </View>
@@ -113,25 +115,20 @@ export default function TabLayout() {
 }
 
 const styles = StyleSheet.create({
-  cartIconContainer: {
-    position: 'relative',
-  },
   badge: {
     position: 'absolute',
-    top: -8,
-    right: -8,
-    backgroundColor: '#FF3B30',
+    right: -6,
+    top: -3,
+    backgroundColor: 'red',
     borderRadius: 10,
     minWidth: 20,
     height: 20,
     justifyContent: 'center',
     alignItems: 'center',
-    paddingHorizontal: 6,
   },
   badgeText: {
     color: 'white',
     fontSize: 12,
     fontWeight: 'bold',
-    textAlign: 'center',
   },
 });
