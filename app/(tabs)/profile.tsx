@@ -7,7 +7,7 @@ import { useCart } from '@/contexts/CartContext';
 import { useNotification } from '@/contexts/NotificationContext';
 
 export default function ProfileScreen() {
-  const { userProfile, logout } = useAuth();
+  const { user, userProfile, logout } = useAuth();
   const { cartCount, clearCart } = useCart();
   const { unreadCount, markAllAsRead, clearNotifications, sendTestNotification } = useNotification();
 
@@ -36,6 +36,10 @@ export default function ProfileScreen() {
     );
   };
 
+  const handleLogin = () => {
+    router.push('/login');
+  };
+
   const handleEditProfile = () => {
     if (!userProfile) {
       router.push('/login');
@@ -62,12 +66,6 @@ export default function ProfileScreen() {
         break;
       case 'View Orders':
         router.push('/adminOrders');
-        break;
-      case 'User Management':
-        Alert.alert('Tindakan Admin', 'Fungsi pengurusan pengguna akan datang tidak lama lagi!');
-        break;
-      case 'Analytics':
-        Alert.alert('Tindakan Admin', 'Fungsi analitik akan datang tidak lama lagi!');
         break;
       default:
         Alert.alert('Tindakan Admin', `Fungsi ${action} akan datang tidak lama lagi!`);
@@ -154,31 +152,21 @@ export default function ProfileScreen() {
           >
             <Text style={styles.adminButtonText}>Lihat Semua Pesanan</Text>
           </TouchableOpacity>
-
-          <TouchableOpacity 
-            style={styles.adminButton}
-            onPress={() => handleAdminAction('User Management')}
-          >
-            <Text style={styles.adminButtonText}>Pengurusan Pengguna</Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity 
-            style={styles.adminButton}
-            onPress={() => handleAdminAction('Analytics')}
-          >
-            <Text style={styles.adminButtonText}>Analitik & Laporan</Text>
-          </TouchableOpacity>
         </View>
       )}
 
       <View style={styles.actionsSection}>
-        <TouchableOpacity style={styles.actionButton} onPress={handleEditProfile}>
-          <Text style={styles.actionButtonText}>Sunting Profil</Text>
-        </TouchableOpacity>
+        {user && (
+          <TouchableOpacity style={styles.actionButton} onPress={handleEditProfile}>
+            <Text style={styles.actionButtonText}>Sunting Profil</Text>
+          </TouchableOpacity>
+        )}
 
-        <TouchableOpacity style={styles.actionButton} onPress={handleChangePassword}>
-          <Text style={styles.actionButtonText}>Tukar Kata Laluan</Text>
-        </TouchableOpacity>
+        {user && (
+          <TouchableOpacity style={styles.actionButton} onPress={handleChangePassword}>
+            <Text style={styles.actionButtonText}>Tukar Kata Laluan</Text>
+          </TouchableOpacity>
+        )}
 
         {cartCount > 0 && (
           <TouchableOpacity 
@@ -191,9 +179,16 @@ export default function ProfileScreen() {
           </TouchableOpacity>
         )}
 
-        <TouchableOpacity style={[styles.actionButton, styles.logoutButton]} onPress={handleLogout}>
-          <Text style={[styles.actionButtonText, styles.logoutButtonText]}>Log Keluar</Text>
-        </TouchableOpacity>
+        {user && (
+          <TouchableOpacity style={[styles.actionButton, styles.logoutButton]} onPress={handleLogout}>
+            <Text style={[styles.actionButtonText, styles.logoutButtonText]}>Log Keluar</Text>
+          </TouchableOpacity>
+        )}
+        {!user && (
+                <TouchableOpacity style={[styles.actionButton, styles.loginButton]} onPress={handleLogin}>
+                    <Text style={[styles.actionButtonText, styles.logoutButtonText]}>Log Masuk</Text>
+                </TouchableOpacity>
+        )}
       </View>
     </ScrollView>
   );
@@ -300,6 +295,12 @@ const styles = StyleSheet.create({
     backgroundColor: '#dc3545',
   },
   logoutButtonText: {
+    color: '#fff',
+  },
+  loginButton: {
+    backgroundColor: '#007AFF',
+  },
+  loginButtonText: {
     color: '#fff',
   },
 }); 
