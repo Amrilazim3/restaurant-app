@@ -177,6 +177,17 @@ export default function RegisterScreen() {
               </Link>
             </View>
           </View>
+
+          {/* Guest browsing option */}
+          <View style={styles.guestSection}>
+            <Text style={styles.guestText}>Mahu lihat menu terlebih dahulu?</Text>
+            <TouchableOpacity
+              style={styles.guestButton}
+              onPress={() => router.push('/guestMenu')}
+            >
+              <Text style={styles.guestButtonText}>Lihat Menu</Text>
+            </TouchableOpacity>
+          </View>
         </View>
       </ScrollView>
     </KeyboardAvoidingView>
@@ -283,6 +294,34 @@ const styles = StyleSheet.create({
   link: {
     color: '#007AFF',
     fontSize: 14,
+    fontWeight: '600',
+  },
+  guestSection: {
+    marginTop: 40,
+    paddingTop: 30,
+    borderTopWidth: 1,
+    borderTopColor: '#eee',
+    alignItems: 'center',
+  },
+  guestText: {
+    fontSize: 14,
+    color: '#666',
+    marginBottom: 16,
+    textAlign: 'center',
+  },
+  guestButton: {
+    backgroundColor: 'transparent',
+    borderWidth: 2,
+    borderColor: '#007AFF',
+    borderRadius: 8,
+    paddingVertical: 12,
+    paddingHorizontal: 24,
+    alignItems: 'center',
+    minWidth: 120,
+  },
+  guestButtonText: {
+    color: '#007AFF',
+    fontSize: 16,
     fontWeight: '600',
   },
 }); 

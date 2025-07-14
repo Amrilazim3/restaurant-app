@@ -11,6 +11,9 @@ import {
 } from 'react-native';
 import { router } from 'expo-router';
 import { useCart, CartItem } from '@/contexts/CartContext';
+import EmptyState from '@/components/EmptyState';
+import Button from '@/components/Button';
+import LoadingSpinner from '@/components/LoadingSpinner';
 
 export default function CartScreen() {
   const { 
@@ -136,9 +139,8 @@ export default function CartScreen() {
 
   if (loading) {
     return (
-      <View style={styles.loadingContainer}>
-        <ActivityIndicator size="large" color="#007AFF" />
-        <Text style={styles.loadingText}>Memuatkan troli...</Text>
+      <View style={styles.container}>
+        <LoadingSpinner text="Memuatkan troli..." />
       </View>
     );
   }
@@ -159,18 +161,13 @@ export default function CartScreen() {
       </View>
 
       {cartItems.length === 0 ? (
-        <View style={styles.emptyContainer}>
-          <Text style={styles.emptyTitle}>Troli anda kosong</Text>
-          <Text style={styles.emptySubtitle}>
-            Tambah beberapa item lazat dari menu kami!
-          </Text>
-          <TouchableOpacity 
-            style={styles.browseButton}
-            onPress={() => router.push('/(tabs)/menu')}
-          >
-            <Text style={styles.browseButtonText}>Lihat Menu</Text>
-          </TouchableOpacity>
-        </View>
+        <EmptyState
+          icon="cart-outline"
+          title="Troli anda kosong"
+          subtitle="Tambah beberapa item lazat dari menu kami!"
+          actionText="Lihat Menu"
+          onAction={() => router.push('/(tabs)/menu')}
+        />
       ) : (
         <>
           {/* Cart Items */}
@@ -201,11 +198,17 @@ export default function CartScreen() {
           </View>
 
           {/* Checkout Button */}
-          <TouchableOpacity style={styles.checkoutButton} onPress={handleCheckout}>
-            <Text style={styles.checkoutButtonText}>
-              Terus ke Checkout
-            </Text>
-          </TouchableOpacity>
+          <View style={styles.checkoutContainer}>
+            <Button
+              title="Terus ke Checkout"
+              onPress={handleCheckout}
+              variant="primary"
+              size="large"
+              fullWidth
+              icon="arrow-forward"
+              iconPosition="right"
+            />
+          </View>
         </>
       )}
     </View>
@@ -217,17 +220,7 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#f5f5f5',
   },
-  loadingContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: '#f5f5f5',
-  },
-  loadingText: {
-    marginTop: 16,
-    fontSize: 16,
-    color: '#666',
-  },
+
   header: {
     padding: 20,
     backgroundColor: '#fff',
@@ -256,35 +249,7 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontWeight: '600',
   },
-  emptyContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    paddingHorizontal: 20,
-  },
-  emptyTitle: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    color: '#333',
-    marginBottom: 12,
-  },
-  emptySubtitle: {
-    fontSize: 16,
-    color: '#666',
-    textAlign: 'center',
-    marginBottom: 32,
-  },
-  browseButton: {
-    backgroundColor: '#007AFF',
-    paddingHorizontal: 32,
-    paddingVertical: 16,
-    borderRadius: 8,
-  },
-  browseButtonText: {
-    color: '#fff',
-    fontSize: 16,
-    fontWeight: '600',
-  },
+
   cartItemsContainer: {
     flex: 1,
     paddingVertical: 16,
@@ -438,17 +403,10 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     color: '#007AFF',
   },
-  checkoutButton: {
-    backgroundColor: '#007AFF',
-    marginHorizontal: 16,
-    marginBottom: 16,
-    paddingVertical: 16,
-    borderRadius: 8,
-    alignItems: 'center',
-  },
-  checkoutButtonText: {
-    color: '#fff',
-    fontSize: 16,
-    fontWeight: '600',
+  checkoutContainer: {
+    padding: 16,
+    backgroundColor: '#fff',
+    borderTopWidth: 1,
+    borderTopColor: '#eee',
   },
 }); 

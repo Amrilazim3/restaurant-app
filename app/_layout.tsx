@@ -9,6 +9,7 @@ import 'react-native-reanimated';
 import { useColorScheme } from '@/components/useColorScheme';
 import { AuthProvider } from '@/contexts/AuthContext';
 import { CartProvider } from '@/contexts/CartContext';
+import { NotificationProvider } from '@/contexts/NotificationContext';
 
 export {
   // Catch any errors thrown by the Layout component.
@@ -46,9 +47,11 @@ export default function RootLayout() {
 
   return (
     <AuthProvider>
-      <CartProvider>
-        <RootLayoutNav />
-      </CartProvider>
+      <NotificationProvider>
+        <CartProvider>
+          <RootLayoutNav />
+        </CartProvider>
+      </NotificationProvider>
     </AuthProvider>
   );
 }
@@ -116,6 +119,46 @@ function RootLayoutNav() {
             title: 'Borang Makanan',
             headerShown: false,
             presentation: 'modal'
+          }} 
+        />
+        <Stack.Screen 
+          name="adminOrders" 
+          options={{ 
+            title: 'Pengurusan Pesanan',
+            headerShown: false,
+            presentation: 'card'
+          }} 
+        />
+        <Stack.Screen 
+          name="checkout" 
+          options={{ 
+            title: 'Bayar',
+            headerShown: true,
+            presentation: 'card'
+          }} 
+        />
+        <Stack.Screen 
+          name="qr-payment" 
+          options={{ 
+            title: 'Pembayaran QR',
+            headerShown: true,
+            presentation: 'card'
+          }} 
+        />
+        <Stack.Screen 
+          name="order-confirmation" 
+          options={{ 
+            title: 'Pengesahan Pesanan',
+            headerShown: true,
+            presentation: 'card'
+          }} 
+        />
+        <Stack.Screen 
+          name="guestMenu" 
+          options={{ 
+            title: 'Menu Kami',
+            headerShown: false,
+            presentation: 'card'
           }} 
         />
       </Stack>

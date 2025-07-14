@@ -21,6 +21,7 @@ import {
   OrderItem 
 } from '@/types/order';
 import { CartItem } from '@/contexts/CartContext';
+import { notificationService } from './notificationService';
 
 const ORDERS_COLLECTION = 'orders';
 
@@ -97,6 +98,19 @@ class OrderService {
       };
 
       const docRef = await addDoc(collection(db, ORDERS_COLLECTION), firestoreData);
+      
+      // Send notification for new order
+      const newOrder: Order = {
+        id: docRef.id,
+        ...orderData,
+      };
+      
+      try {
+        await notificationService.notifyNewOrder(newOrder);
+      } catch (error) {
+        console.error('Failed to send new order notification:', error);
+      }
+      
       return docRef.id;
     } catch (error) {
       console.error('Error creating order:', error);
@@ -211,6 +225,16 @@ class OrderService {
       }
 
       await updateDoc(doc(db, ORDERS_COLLECTION, orderId), updateData);
+      
+      // Send notification for status change
+      try {
+        const order = await this.getOrderById(orderId);
+        if (order) {
+          await notificationService.notifyOrderStatusChange(order, status);
+        }
+      } catch (error) {
+        console.error('Failed to send order status notification:', error);
+      }
     } catch (error) {
       console.error('Error updating order status:', error);
       throw new Error('Failed to update order status. Please try again.');
@@ -226,6 +250,16 @@ class OrderService {
         paymentConfirmed: true,
         updatedAt: Timestamp.fromDate(new Date())
       });
+      
+      // Send notification for payment confirmation
+      try {
+        const order = await this.getOrderById(orderId);
+        if (order) {
+          await notificationService.notifyPaymentConfirmed(order);
+        }
+      } catch (error) {
+        console.error('Failed to send payment confirmation notification:', error);
+      }
     } catch (error) {
       console.error('Error confirming payment:', error);
       throw new Error('Failed to confirm payment. Please try again.');

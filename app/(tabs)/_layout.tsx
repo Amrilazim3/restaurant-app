@@ -9,6 +9,8 @@ import { useColorScheme } from '@/components/useColorScheme';
 import { useClientOnlyValue } from '@/components/useClientOnlyValue';
 import { useAuth } from '@/contexts/AuthContext';
 import { useCart } from '@/contexts/CartContext';
+import { useNotification } from '@/contexts/NotificationContext';
+import NotificationBadge from '@/components/NotificationBadge';
 
 // You can explore the built-in icon families and icons on the web at https://icons.expo.fyi/
 function TabBarIcon(props: {
@@ -35,12 +37,9 @@ export default function TabLayout() {
   const colorScheme = useColorScheme();
   const { user, loading } = useAuth();
   const { cartCount } = useCart();
+  const { unreadCount } = useNotification();
 
-  useEffect(() => {
-    if (!loading && !user) {
-      router.replace('/(auth)/login');
-    }
-  }, [user, loading]);
+  // Removed automatic redirect to login - now handled by welcome screen
 
   if (loading) {
     return (
@@ -50,7 +49,9 @@ export default function TabLayout() {
     );
   }
 
+  // If no user, redirect to welcome screen
   if (!user) {
+    router.replace('/');
     return null;
   }
 
@@ -92,7 +93,12 @@ export default function TabLayout() {
         name="orders"
         options={{
           title: 'Pesanan',
-          tabBarIcon: ({ color }) => <TabBarIcon name="list" color={color} />,
+          tabBarIcon: ({ color }) => (
+            <View style={styles.cartIconContainer}>
+              <TabBarIcon name="list" color={color} />
+              <NotificationBadge count={unreadCount} />
+            </View>
+          ),
         }}
       />
       <Tabs.Screen

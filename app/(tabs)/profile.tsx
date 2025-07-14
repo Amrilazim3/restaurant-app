@@ -4,10 +4,12 @@ import { router } from 'expo-router';
 import { Text, View } from '@/components/Themed';
 import { useAuth } from '@/contexts/AuthContext';
 import { useCart } from '@/contexts/CartContext';
+import { useNotification } from '@/contexts/NotificationContext';
 
 export default function ProfileScreen() {
   const { userProfile, logout } = useAuth();
   const { cartCount, clearCart } = useCart();
+  const { unreadCount, markAllAsRead, clearNotifications, sendTestNotification } = useNotification();
 
   const handleLogout = () => {
     Alert.alert(
@@ -109,6 +111,13 @@ export default function ProfileScreen() {
             <Text style={styles.profileValue}>{cartCount} item</Text>
           </View>
         )}
+
+        {unreadCount > 0 && (
+          <View style={styles.profileItem}>
+            <Text style={styles.profileLabel}>Notifikasi</Text>
+            <Text style={styles.profileValue}>{unreadCount} belum dibaca</Text>
+          </View>
+        )}
       </View>
 
       {/* Admin Panel */}
@@ -177,6 +186,20 @@ export default function ProfileScreen() {
             </Text>
           </TouchableOpacity>
         )}
+
+        <TouchableOpacity style={styles.actionButton} onPress={sendTestNotification}>
+          <Text style={styles.actionButtonText}>Ujian Notifikasi</Text>
+        </TouchableOpacity>
+
+        {unreadCount > 0 && (
+          <TouchableOpacity style={styles.actionButton} onPress={markAllAsRead}>
+            <Text style={styles.actionButtonText}>Tandakan Semua Dibaca</Text>
+          </TouchableOpacity>
+        )}
+
+        <TouchableOpacity style={styles.actionButton} onPress={clearNotifications}>
+          <Text style={styles.actionButtonText}>Padam Semua Notifikasi</Text>
+        </TouchableOpacity>
 
         <TouchableOpacity style={styles.actionButton}>
           <Text style={styles.actionButtonText}>Tetapan</Text>

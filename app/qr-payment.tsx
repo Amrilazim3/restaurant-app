@@ -8,6 +8,7 @@ import {
   ActivityIndicator,
   Image,
   Dimensions,
+  ScrollView,
 } from 'react-native';
 import { router, useLocalSearchParams } from 'expo-router';
 import { orderService } from '@/services/orderService';
@@ -139,7 +140,7 @@ export default function QRPaymentScreen() {
   }
 
   return (
-    <View style={styles.container}>
+    <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
       {/* Header */}
       <View style={styles.header}>
         <Text style={styles.title}>Pembayaran QR Code</Text>
@@ -207,7 +208,7 @@ export default function QRPaymentScreen() {
           Jangan kongsikan kod QR ini dengan orang lain
         </Text>
       </View>
-    </View>
+    </ScrollView>
   );
 }
 
