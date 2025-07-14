@@ -31,21 +31,21 @@ export default function OrdersScreen() {
   const [refreshing, setRefreshing] = useState(false);
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
   const [showOrderModal, setShowOrderModal] = useState(false);
-  const { user } = useAuth();
+  const { userProfile } = useAuth();
 
   useEffect(() => {
     loadOrders();
   }, []);
 
   const loadOrders = async () => {
-    if (!user) {
+    if (!userProfile) {
         setLoading(false);
         return;
     };
 
     try {
       setLoading(true);
-      const userOrders = await orderService.getUserOrders(user.uid);
+      const userOrders = await orderService.getUserOrders(userProfile?.uid || '');
       setOrders(userOrders);
     } catch (error) {
       console.error('Error loading orders:', error);

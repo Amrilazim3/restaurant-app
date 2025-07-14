@@ -125,8 +125,7 @@ class OrderService {
     try {
       const q = query(
         collection(db, ORDERS_COLLECTION),
-        where('userId', '==', userId),
-        orderBy('createdAt', 'desc')
+        where('userId', '==', userId)
       );
       
       const querySnapshot = await getDocs(q);
@@ -143,7 +142,8 @@ class OrderService {
         } as Order);
       });
 
-      return orders;
+      // Sort by createdAt descending (newest first) client-side to avoid composite index requirement
+      return orders.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
     } catch (error) {
       console.error('Error fetching user orders:', error);
       throw new Error('Failed to fetch orders. Please try again.');
@@ -288,8 +288,7 @@ class OrderService {
     try {
       const q = query(
         collection(db, ORDERS_COLLECTION),
-        where('orderStatus', '==', status),
-        orderBy('createdAt', 'desc')
+        where('orderStatus', '==', status)
       );
       
       const querySnapshot = await getDocs(q);
@@ -306,7 +305,8 @@ class OrderService {
         } as Order);
       });
 
-      return orders;
+      // Sort by createdAt descending (newest first) client-side to avoid composite index requirement
+      return orders.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
     } catch (error) {
       console.error('Error fetching orders by status:', error);
       throw new Error('Failed to fetch orders. Please try again.');
@@ -319,8 +319,7 @@ class OrderService {
   subscribeToUserOrders(userId: string, callback: (orders: Order[]) => void): () => void {
     const q = query(
       collection(db, ORDERS_COLLECTION),
-      where('userId', '==', userId),
-      orderBy('createdAt', 'desc')
+      where('userId', '==', userId)
     );
 
     const unsubscribe = onSnapshot(q, (snapshot) => {
@@ -335,7 +334,10 @@ class OrderService {
           estimatedDeliveryTime: data.estimatedDeliveryTime?.toDate()
         } as Order);
       });
-      callback(orders);
+      
+      // Sort by createdAt descending (newest first) client-side to avoid composite index requirement
+      const sortedOrders = orders.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+      callback(sortedOrders);
     }, (error) => {
       console.error('Error subscribing to user orders:', error);
     });
