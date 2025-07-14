@@ -129,32 +129,33 @@ export default function AdminOrdersScreen() {
     try {
       setUpdatingStatus(true);
       await orderService.updateOrderStatus(selectedOrder.id!, newStatus);
-      await loadOrders();
+      
+      // Close modals immediately after successful update
+      setShowStatusModal(false);
+      setShowOrderModal(false);
+      
+      // Show success message after modals are closed
+      Alert.alert('Berjaya', 'Status pesanan berjaya dikemas kini');
     } catch (error) {
       console.error('Error updating order status:', error);
       Alert.alert('Ralat', 'Gagal mengemaskini status pesanan. Sila cuba lagi.');
     } finally {
       setUpdatingStatus(false);
-      setTimeout(() => {
-        setShowStatusModal(false);
-      }, 200);
-      setTimeout(() => {
-        setShowOrderModal(false);
-        Alert.alert('Berjaya', 'Status pesanan berjaya dikemas kini');
-      }, 500);
     }
   };
 
   const confirmPayment = async (orderId: string) => {
     try {
       await orderService.confirmPayment(orderId);
-      await loadOrders();
+      
+      // Close modal immediately after successful confirmation
+      setShowOrderModal(false);
+      
+      // Show success message
+      Alert.alert('Berjaya', 'Pembayaran telah disahkan');
     } catch (error) {
       console.error('Error confirming payment:', error);
       Alert.alert('Ralat', 'Gagal mengesahkan pembayaran. Sila cuba lagi.');
-    } finally {
-      setShowOrderModal(false);
-      Alert.alert('Berjaya', 'Pembayaran telah disahkan');
     }
   };
 
