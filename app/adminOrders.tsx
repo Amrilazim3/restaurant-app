@@ -129,15 +129,19 @@ export default function AdminOrdersScreen() {
     try {
       setUpdatingStatus(true);
       await orderService.updateOrderStatus(selectedOrder.id!, newStatus);
-      setShowStatusModal(false);
-      setShowOrderModal(false);
       await loadOrders();
-      Alert.alert('Berjaya', 'Status pesanan berjaya dikemas kini');
     } catch (error) {
       console.error('Error updating order status:', error);
       Alert.alert('Ralat', 'Gagal mengemaskini status pesanan. Sila cuba lagi.');
     } finally {
       setUpdatingStatus(false);
+      setTimeout(() => {
+        setShowStatusModal(false);
+      }, 200);
+      setTimeout(() => {
+        setShowOrderModal(false);
+        Alert.alert('Berjaya', 'Status pesanan berjaya dikemas kini');
+      }, 500);
     }
   };
 
@@ -145,10 +149,12 @@ export default function AdminOrdersScreen() {
     try {
       await orderService.confirmPayment(orderId);
       await loadOrders();
-      Alert.alert('Berjaya', 'Pembayaran telah disahkan');
     } catch (error) {
       console.error('Error confirming payment:', error);
       Alert.alert('Ralat', 'Gagal mengesahkan pembayaran. Sila cuba lagi.');
+    } finally {
+      setShowOrderModal(false);
+      Alert.alert('Berjaya', 'Pembayaran telah disahkan');
     }
   };
 
@@ -362,7 +368,7 @@ export default function AdminOrdersScreen() {
   const StatusModal = () => (
     <Modal
       visible={showStatusModal}
-      animationType="slide"
+      animationType="fade"
       transparent={true}
       onRequestClose={() => setShowStatusModal(false)}
     >
@@ -444,32 +450,34 @@ export default function AdminOrdersScreen() {
         />
       </View>
 
-      <ScrollView
-        horizontal
-        style={styles.filterContainer}
-        showsHorizontalScrollIndicator={false}
-      >
-        <TouchableOpacity
-          style={[styles.filterButton, statusFilter === 'all' && styles.activeFilter]}
-          onPress={() => setStatusFilter('all')}
+      <View style={styles.filterContainer}>
+        <ScrollView
+            horizontal
+            style={styles.filterContainer}
+            showsHorizontalScrollIndicator={false}
         >
-          <Text style={[styles.filterText, statusFilter === 'all' && styles.activeFilterText]}>
-            Semua
-          </Text>
-        </TouchableOpacity>
-        
-        {Object.entries(ORDER_STATUS_LABELS).map(([status, label]) => (
-          <TouchableOpacity
-            key={status}
-            style={[styles.filterButton, statusFilter === status && styles.activeFilter]}
-            onPress={() => setStatusFilter(status as OrderStatus)}
-          >
-            <Text style={[styles.filterText, statusFilter === status && styles.activeFilterText]}>
-              {label}
+            <TouchableOpacity
+            style={[styles.filterButton, statusFilter === 'all' && styles.activeFilter]}
+            onPress={() => setStatusFilter('all')}
+            >
+            <Text style={[styles.filterText, statusFilter === 'all' && styles.activeFilterText]}>
+                Semua
             </Text>
-          </TouchableOpacity>
-        ))}
-      </ScrollView>
+            </TouchableOpacity>
+            
+            {Object.entries(ORDER_STATUS_LABELS).map(([status, label]) => (
+            <TouchableOpacity
+                key={status}
+                style={[styles.filterButton, statusFilter === status && styles.activeFilter]}
+                onPress={() => setStatusFilter(status as OrderStatus)}
+            >
+                <Text style={[styles.filterText, statusFilter === status && styles.activeFilterText]}>
+                {label}
+                </Text>
+            </TouchableOpacity>
+            ))}
+        </ScrollView>
+      </View>
 
       <ScrollView
         style={styles.ordersContainer}
