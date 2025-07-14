@@ -22,7 +22,8 @@
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/adaptive-icon.png",
         "backgroundColor": "#ffffff"
-      }
+      },
+      "package": "com.amrilazim_3.restaurantapp"
     },
     "web": {
       "bundler": "metro",
@@ -35,10 +36,7 @@
         "expo-notifications",
         {
           "icon": "./assets/images/icon.png",
-          "color": "#ffffff",
-          "sounds": [
-            "./assets/sounds/notification.wav"
-          ]
+          "color": "#ffffff"
         }
       ]
     ],
@@ -47,8 +45,13 @@
     },
     "extra": {
       "eas": {
-        "projectId": "YOUR_PROJECT_ID_HERE"
-      }
-    }
+        "projectId": "efa4027e-d369-45e7-8305-90bef77ed3bd"
+      },
+      "firebase": {
+        "projectId": "retaurant-block-twenty-9"
+      },
+      "router": {}
+    },
+    "owner": "amrilazim_3"
   }
 }

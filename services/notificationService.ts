@@ -116,13 +116,9 @@ class NotificationService {
       }
       
       try {
-        const projectId = Constants.expoConfig?.extra?.eas?.projectId ?? Constants.easConfig?.projectId;
+        // Use Firebase project ID for push notifications
+        const projectId = Constants.expoConfig?.extra?.firebase?.projectId ?? 'retaurant-block-twenty-9';
         
-        if (!projectId) {
-          console.warn('Project ID not found - Push notifications will not work. Please configure Firebase in your expo config.');
-          return null;
-        }
-
         token = (await Notifications.getExpoPushTokenAsync({ projectId })).data;
         this.expoPushToken = token;
         console.log('Push token:', token);
