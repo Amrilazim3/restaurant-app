@@ -135,3 +135,7 @@ eas build --platform android --profile production
 ## License
 
 This project is licensed under the MIT License. 
+
+
+## command for EAS build for android
+eas build --platform android --profile preview
