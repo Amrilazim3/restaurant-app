@@ -183,7 +183,7 @@ export default function RegisterScreen() {
             <Text style={styles.guestText}>Mahu lihat menu terlebih dahulu?</Text>
             <TouchableOpacity
               style={styles.guestButton}
-              onPress={() => router.push('/guestMenu')}
+              onPress={() => router.push('/(tabs)/menu')}
             >
               <Text style={styles.guestButtonText}>Lihat Menu</Text>
             </TouchableOpacity>
