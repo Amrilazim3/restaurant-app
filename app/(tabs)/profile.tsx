@@ -37,11 +37,19 @@ export default function ProfileScreen() {
   };
 
   const handleEditProfile = () => {
-    router.push('/editProfile');
+    if (!userProfile) {
+      router.push('/login');
+    } else {
+      router.push('/editProfile');
+    }
   };
 
   const handleChangePassword = () => {
-    router.push('/changePassword');
+    if (!userProfile) {
+      router.push('/login');
+    } else {
+      router.push('/changePassword');
+    }
   };
 
   const handleAdminAction = (action: string) => {

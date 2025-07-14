@@ -38,22 +38,6 @@ export default function HomeScreen() {
           <Text style={styles.actionButtonText}>Pesanan Saya</Text>
         </TouchableOpacity>
       </View>
-
-      <View style={styles.section}>
-        <Text style={styles.sectionTitle}>Item Pilihan</Text>
-        <View style={styles.featuredItem}>
-          <Text style={styles.featuredItemName}>Burger Signature</Text>
-          <Text style={styles.featuredItemPrice}>RM12.99</Text>
-        </View>
-        <View style={styles.featuredItem}>
-          <Text style={styles.featuredItemName}>Kentang Truffle</Text>
-          <Text style={styles.featuredItemPrice}>RM8.99</Text>
-        </View>
-        <View style={styles.featuredItem}>
-          <Text style={styles.featuredItemName}>Bir Artisan</Text>
-          <Text style={styles.featuredItemPrice}>RM5.99</Text>
-        </View>
-      </View>
     </ScrollView>
   );
 }
