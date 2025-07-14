@@ -180,10 +180,6 @@ export default function ProfileScreen() {
           <Text style={styles.actionButtonText}>Tukar Kata Laluan</Text>
         </TouchableOpacity>
 
-        <TouchableOpacity style={styles.actionButton}>
-          <Text style={styles.actionButtonText}>Sejarah Pesanan</Text>
-        </TouchableOpacity>
-
         {cartCount > 0 && (
           <TouchableOpacity 
             style={[styles.actionButton, styles.clearCartButton]} 
@@ -194,24 +190,6 @@ export default function ProfileScreen() {
             </Text>
           </TouchableOpacity>
         )}
-
-        <TouchableOpacity style={styles.actionButton} onPress={sendTestNotification}>
-          <Text style={styles.actionButtonText}>Ujian Notifikasi</Text>
-        </TouchableOpacity>
-
-        {unreadCount > 0 && (
-          <TouchableOpacity style={styles.actionButton} onPress={markAllAsRead}>
-            <Text style={styles.actionButtonText}>Tandakan Semua Dibaca</Text>
-          </TouchableOpacity>
-        )}
-
-        <TouchableOpacity style={styles.actionButton} onPress={clearNotifications}>
-          <Text style={styles.actionButtonText}>Padam Semua Notifikasi</Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity style={styles.actionButton}>
-          <Text style={styles.actionButtonText}>Tetapan</Text>
-        </TouchableOpacity>
 
         <TouchableOpacity style={[styles.actionButton, styles.logoutButton]} onPress={handleLogout}>
           <Text style={[styles.actionButtonText, styles.logoutButtonText]}>Log Keluar</Text>
