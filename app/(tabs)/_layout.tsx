@@ -1,7 +1,7 @@
 import { Tabs } from 'expo-router';
-import React, { useEffect, useMemo } from 'react';
+import React, { useEffect, useMemo, useState, useCallback } from 'react';
 import { View, Text, StyleSheet, ActivityIndicator } from 'react-native';
-import { router } from 'expo-router';
+import { router, useFocusEffect } from 'expo-router';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
 
 import Colors from '@/constants/Colors';
@@ -11,6 +11,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useCart } from '@/contexts/CartContext';
 import { useNotification } from '@/contexts/NotificationContext';
 import NotificationBadge from '@/components/NotificationBadge';
+import { orderService } from '@/services/orderService';
 
 // You can explore the built-in icon families and icons on the web at https://icons.expo.fyi/
 function TabBarIcon(props: {
@@ -35,14 +36,40 @@ const CartBadge = ({ count }: { count: number }) => {
 
 export default function TabLayout() {
   const colorScheme = useColorScheme();
-  const { user, loading } = useAuth();
+  const { user, userProfile, loading } = useAuth();
   const { cartCount } = useCart();
+  const [ordersCount, setOrdersCount] = useState(0);
   
   // Always call useNotification at the top level
   const { unreadCount } = useNotification();
-  
-  // Only use the unreadCount if user exists
-  const displayUnreadCount = user ? unreadCount : 0;
+
+  // Load user orders count
+  const loadOrdersCount = useCallback(async () => {
+    if (!userProfile) {
+      setOrdersCount(0);
+      return;
+    }
+
+    try {
+      const userOrders = await orderService.getUserOrders(userProfile.uid);
+      setOrdersCount(userOrders.length);
+    } catch (error) {
+      console.error('Error loading orders count:', error);
+      setOrdersCount(0);
+    }
+  }, [userProfile]);
+
+  // Load orders count when component mounts or user changes
+  useEffect(() => {
+    loadOrdersCount();
+  }, [loadOrdersCount]);
+
+  // Reload orders count when tab is focused
+  useFocusEffect(
+    useCallback(() => {
+      loadOrdersCount();
+    }, [loadOrdersCount])
+  );
 
   // Removed automatic redirect to login - now handled by welcome screen
 
@@ -93,7 +120,7 @@ export default function TabLayout() {
           tabBarIcon: ({ color }) => (
             <View style={{ position: 'relative' }}>
               <TabBarIcon name="list" color={color} />
-              <NotificationBadge count={displayUnreadCount} />
+              <NotificationBadge count={ordersCount} />
             </View>
           ),
         }}
