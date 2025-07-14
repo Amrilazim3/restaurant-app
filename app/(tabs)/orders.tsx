@@ -33,24 +33,15 @@ export default function OrdersScreen() {
   const [showOrderModal, setShowOrderModal] = useState(false);
   const { user } = useAuth();
 
-  useFocusEffect(
-    useCallback(() => {
-      if (user) {
-        // Set up real-time subscription
-        const unsubscribe = orderService.subscribeToUserOrders(user.uid, (orders) => {
-          setOrders(orders);
-          setLoading(false);
-        });
-
-        return () => {
-          unsubscribe();
-        };
-      }
-    }, [user])
-  );
+  useEffect(() => {
+    loadOrders();
+  }, []);
 
   const loadOrders = async () => {
-    if (!user) return;
+    if (!user) {
+        setLoading(false);
+        return;
+    };
 
     try {
       setLoading(true);

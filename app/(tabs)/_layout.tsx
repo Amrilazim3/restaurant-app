@@ -38,16 +38,11 @@ export default function TabLayout() {
   const { user, loading } = useAuth();
   const { cartCount } = useCart();
   
-  // Get notification context - provide fallback if not available
-  let unreadCount = 0;
-  try {
-    if (user) {
-      const notificationContext = useNotification();
-      unreadCount = notificationContext.unreadCount;
-    }
-  } catch (error) {
-    console.error('Error accessing notification context:', error);
-  }
+  // Always call useNotification at the top level
+  const { unreadCount } = useNotification();
+  
+  // Only use the unreadCount if user exists
+  const displayUnreadCount = user ? unreadCount : 0;
 
   // Removed automatic redirect to login - now handled by welcome screen
 
@@ -98,7 +93,7 @@ export default function TabLayout() {
           tabBarIcon: ({ color }) => (
             <View style={{ position: 'relative' }}>
               <TabBarIcon name="list" color={color} />
-              <NotificationBadge count={unreadCount} />
+              <NotificationBadge count={displayUnreadCount} />
             </View>
           ),
         }}
