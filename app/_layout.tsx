@@ -5,6 +5,9 @@ import { Stack } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
 import { useEffect } from 'react';
 import 'react-native-reanimated';
+import { TamaguiProvider } from 'tamagui';
+import { PortalProvider } from '@tamagui/portal';
+import config from '../tamagui.config';
 
 import { useColorScheme } from '@/components/useColorScheme';
 import { AuthProvider } from '@/contexts/AuthContext';
@@ -46,13 +49,17 @@ export default function RootLayout() {
   }
 
   return (
-    <AuthProvider>
-      <NotificationProvider>
-        <CartProvider>
-          <RootLayoutNav />
-        </CartProvider>
-      </NotificationProvider>
-    </AuthProvider>
+    <TamaguiProvider config={config}>
+      <PortalProvider shouldAddRootHost>
+        <AuthProvider>
+          <NotificationProvider>
+            <CartProvider>
+              <RootLayoutNav />
+            </CartProvider>
+          </NotificationProvider>
+        </AuthProvider>
+      </PortalProvider>
+    </TamaguiProvider>
   );
 }
 
