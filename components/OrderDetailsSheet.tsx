@@ -38,6 +38,7 @@ interface OrderDetailsSheetProps {
   onOpenChange: (open: boolean) => void;
   onUpdateStatus: () => void;
   onConfirmPayment: () => void;
+  showAdminActions?: boolean;
 }
 
 export function OrderDetailsSheet({ 
@@ -45,7 +46,8 @@ export function OrderDetailsSheet({
   open, 
   onOpenChange, 
   onUpdateStatus, 
-  onConfirmPayment 
+  onConfirmPayment,
+  showAdminActions = true
 }: OrderDetailsSheetProps) {
   if (!order) return null;
 
@@ -181,27 +183,29 @@ export function OrderDetailsSheet({
             </YStack>
 
             {/* Action Buttons */}
-            <YStack space="$3" marginTop="$4">
-              <Button
-                backgroundColor="$blue10"
-                color="white"
-                onPress={onUpdateStatus}
-                size="$5"
-              >
-                Kemaskini Status
-              </Button>
-
-              {!order.paymentConfirmed && order.paymentMethod === 'qr_code' && (
+            {showAdminActions && (
+              <YStack space="$3" marginTop="$4">
                 <Button
-                  backgroundColor="$green10"
+                  backgroundColor="$blue10"
                   color="white"
-                  onPress={onConfirmPayment}
-                  size="$4"
+                  onPress={onUpdateStatus}
+                  size="$5"
                 >
-                  Sahkan Pembayaran
+                  Kemaskini Status
                 </Button>
-              )}
-            </YStack>
+
+                {!order.paymentConfirmed && order.paymentMethod === 'qr_code' && (
+                  <Button
+                    backgroundColor="$green10"
+                    color="white"
+                    onPress={onConfirmPayment}
+                    size="$4"
+                  >
+                    Sahkan Pembayaran
+                  </Button>
+                )}
+              </YStack>
+            )}
           </ScrollView>
         </YStack>
       </Sheet.Frame>
