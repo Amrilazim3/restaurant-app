@@ -8,7 +8,7 @@
     "scheme": "myapp",
     "userInterfaceStyle": "light",
     "splash": {
-      "image": "./assets/images/block-twenty-9-splash-icon.png",
+      "image": "./assets/images/block-twenty-9-icon.png",
       "resizeMode": "contain",
       "backgroundColor": "#ffffff"
     },
