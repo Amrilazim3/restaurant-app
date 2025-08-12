@@ -15,6 +15,7 @@ import { router, useLocalSearchParams } from 'expo-router';
 import { useCart } from '@/contexts/CartContext';
 import { useAuth } from '@/contexts/AuthContext';
 import { orderService } from '@/services/orderService';
+import { authService } from '@/services/authService';
 import { 
   CreateOrderRequest, 
   DeliveryAddress, 
@@ -129,6 +130,39 @@ export default function CheckoutScreen() {
     setLoading(true);
     
     try {
+      let userId = user?.uid;
+      
+      // If user is not authenticated, create a user account first
+      let accountCreated = false;
+      if (!user && guestInfo.email && guestInfo.fullName) {
+        try {
+          // Use standard password for guest users
+          const standardPassword = 'password';
+          
+          const userProfile = await authService.register(
+            guestInfo.email,
+            standardPassword,
+            guestInfo.fullName,
+            'user'
+          );
+          
+          userId = userProfile.uid;
+          accountCreated = true;
+        } catch (authError: any) {
+          console.error('Error creating user account:', authError);
+          
+          // Check if error is due to existing email
+          if (authError?.code === 'auth/email-already-in-use') {
+            console.log('Email already exists, continuing with guest order flow');
+            // Continue with guest info but no userId - order will be created without user link
+            userId = undefined;
+          } else {
+            // For other errors, still continue with guest flow
+            userId = undefined;
+          }
+        }
+      }
+
       const orderRequest: CreateOrderRequest = {
         items: orderService.convertCartItemsToOrderItems(cartItems),
         deliveryAddress,
@@ -138,7 +172,7 @@ export default function CheckoutScreen() {
         notes: orderNotes
       };
 
-      const orderId = await orderService.createOrder(orderRequest, user?.uid);
+      const orderId = await orderService.createOrder(orderRequest, userId);
 
       // Clear cart after successful order
       clearCart();
@@ -147,12 +181,12 @@ export default function CheckoutScreen() {
       if (paymentMethod === 'qr_code') {
         router.push({
           pathname: '/qr-payment',
-          params: { orderId }
+          params: { orderId, accountCreated: accountCreated.toString() }
         });
       } else {
         router.push({
           pathname: '/order-confirmation',
-          params: { orderId }
+          params: { orderId, accountCreated: accountCreated.toString() }
         });
       }
       

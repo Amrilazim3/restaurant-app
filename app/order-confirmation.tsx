@@ -13,9 +13,10 @@ import { orderService } from '@/services/orderService';
 import { Order } from '@/types/order';
 
 export default function OrderConfirmationScreen() {
-  const { orderId } = useLocalSearchParams<{ orderId: string }>();
+  const { orderId, accountCreated } = useLocalSearchParams<{ orderId: string; accountCreated?: string }>();
   const [order, setOrder] = useState<Order | null>(null);
   const [loading, setLoading] = useState(true);
+  const isAccountCreated = accountCreated === 'true';
 
   useEffect(() => {
     if (orderId) {
@@ -132,6 +133,48 @@ export default function OrderConfirmationScreen() {
           Terima kasih atas pesanan anda. Kami akan menyediakan makanan anda dengan segera.
         </Text>
       </View>
+
+      {/* Account Info for Guest Users */}
+      {order?.guestInfo && isAccountCreated && (
+        <View style={styles.accountInfoSection}>
+          <View style={styles.accountInfoHeader}>
+            <Text style={styles.accountInfoIcon}>👤</Text>
+            <Text style={styles.accountInfoTitle}>Akaun Anda Telah Dibuat!</Text>
+          </View>
+          <Text style={styles.accountInfoSubtitle}>
+            Kami telah membuat akaun untuk anda supaya anda boleh mengikut pesanan anda.
+          </Text>
+          <View style={styles.credentialsBox}>
+            <View style={styles.credentialRow}>
+              <Text style={styles.credentialLabel}>Email:</Text>
+              <Text style={styles.credentialValue}>{order.guestInfo.email}</Text>
+            </View>
+            <View style={styles.credentialRow}>
+              <Text style={styles.credentialLabel}>Kata Laluan:</Text>
+              <Text style={styles.credentialValue}>password</Text>
+            </View>
+          </View>
+          <Text style={styles.accountInfoNote}>
+            💡 Anda boleh log masuk menggunakan maklumat di atas dan tukar kata laluan anda melalui Profil → Tukar Kata Laluan
+          </Text>
+        </View>
+      )}
+
+      {/* Existing Email Info for Guest Users */}
+      {order?.guestInfo && !isAccountCreated && (
+        <View style={styles.existingEmailSection}>
+          <View style={styles.existingEmailHeader}>
+            <Text style={styles.existingEmailIcon}>ℹ️</Text>
+            <Text style={styles.existingEmailTitle}>Email Sudah Wujud</Text>
+          </View>
+          <Text style={styles.existingEmailSubtitle}>
+            Email <Text style={styles.emailHighlight}>{order.guestInfo.email}</Text> sudah mempunyai akaun dalam sistem kami.
+          </Text>
+          <Text style={styles.existingEmailNote}>
+            💡 Log masuk ke akaun anda untuk melihat semua pesanan anda dalam satu tempat. Pergi ke tab Profil untuk log masuk.
+          </Text>
+        </View>
+      )}
 
       {/* Order Info */}
       <View style={styles.section}>
@@ -545,5 +588,100 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: '#666',
     lineHeight: 22,
+  },
+  accountInfoSection: {
+    backgroundColor: '#e8f4fd',
+    marginTop: 12,
+    padding: 20,
+    borderLeftWidth: 4,
+    borderLeftColor: '#007AFF',
+  },
+  accountInfoHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 12,
+  },
+  accountInfoIcon: {
+    fontSize: 24,
+    marginRight: 12,
+  },
+  accountInfoTitle: {
+    fontSize: 20,
+    fontWeight: '600',
+    color: '#007AFF',
+  },
+  accountInfoSubtitle: {
+    fontSize: 16,
+    color: '#333',
+    marginBottom: 16,
+    lineHeight: 22,
+  },
+  credentialsBox: {
+    backgroundColor: '#fff',
+    padding: 16,
+    borderRadius: 8,
+    marginBottom: 16,
+    borderWidth: 1,
+    borderColor: '#ddd',
+  },
+  credentialRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 8,
+  },
+  credentialLabel: {
+    fontSize: 16,
+    color: '#666',
+    fontWeight: '500',
+  },
+  credentialValue: {
+    fontSize: 16,
+    color: '#333',
+    fontWeight: '600',
+    fontFamily: 'monospace',
+  },
+  accountInfoNote: {
+    fontSize: 14,
+    color: '#666',
+    lineHeight: 20,
+    fontStyle: 'italic',
+  },
+  existingEmailSection: {
+    backgroundColor: '#fff3cd',
+    marginTop: 12,
+    padding: 20,
+    borderLeftWidth: 4,
+    borderLeftColor: '#ffc107',
+  },
+  existingEmailHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 12,
+  },
+  existingEmailIcon: {
+    fontSize: 24,
+    marginRight: 12,
+  },
+  existingEmailTitle: {
+    fontSize: 20,
+    fontWeight: '600',
+    color: '#856404',
+  },
+  existingEmailSubtitle: {
+    fontSize: 16,
+    color: '#333',
+    marginBottom: 16,
+    lineHeight: 22,
+  },
+  emailHighlight: {
+    fontWeight: '600',
+    color: '#856404',
+  },
+  existingEmailNote: {
+    fontSize: 14,
+    color: '#666',
+    lineHeight: 20,
+    fontStyle: 'italic',
   },
 }); 
