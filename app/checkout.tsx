@@ -133,7 +133,6 @@ export default function CheckoutScreen() {
       let userId = user?.uid;
       
       // If user is not authenticated, create a user account first
-      let accountCreated = false;
       if (!user && guestInfo.email && guestInfo.fullName) {
         try {
           // Use standard password for guest users
@@ -147,18 +146,38 @@ export default function CheckoutScreen() {
           );
           
           userId = userProfile.uid;
-          accountCreated = true;
         } catch (authError: any) {
           console.error('Error creating user account:', authError);
           
           // Check if error is due to existing email
           if (authError?.code === 'auth/email-already-in-use') {
-            console.log('Email already exists, continuing with guest order flow');
-            // Continue with guest info but no userId - order will be created without user link
-            userId = undefined;
+            setLoading(false);
+            Alert.alert(
+              'Email Sudah Wujud',
+              `Email "${guestInfo.email}" sudah mempunyai akaun dalam sistem kami. Sila pilih tindakan:`,
+              [
+                {
+                  text: 'Guna Email Lain',
+                  style: 'default',
+                },
+                {
+                  text: 'Log Masuk',
+                  style: 'default',
+                  onPress: () => {
+                    router.push('/(auth)/login');
+                  }
+                }
+              ]
+            );
+            return; // Stop the order creation process
           } else {
-            // For other errors, still continue with guest flow
-            userId = undefined;
+            // For other authentication errors, show error and stop
+            setLoading(false);
+            Alert.alert(
+              'Ralat Pendaftaran',
+              'Terdapat masalah semasa membuat akaun. Sila cuba lagi.'
+            );
+            return;
           }
         }
       }
@@ -181,12 +200,12 @@ export default function CheckoutScreen() {
       if (paymentMethod === 'qr_code') {
         router.push({
           pathname: '/qr-payment',
-          params: { orderId, accountCreated: accountCreated.toString() }
+          params: { orderId }
         });
       } else {
         router.push({
           pathname: '/order-confirmation',
-          params: { orderId, accountCreated: accountCreated.toString() }
+          params: { orderId }
         });
       }
       

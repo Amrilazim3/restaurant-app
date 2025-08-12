@@ -13,10 +13,9 @@ import { orderService } from '@/services/orderService';
 import { Order } from '@/types/order';
 
 export default function OrderConfirmationScreen() {
-  const { orderId, accountCreated } = useLocalSearchParams<{ orderId: string; accountCreated?: string }>();
+  const { orderId } = useLocalSearchParams<{ orderId: string }>();
   const [order, setOrder] = useState<Order | null>(null);
   const [loading, setLoading] = useState(true);
-  const isAccountCreated = accountCreated === 'true';
 
   useEffect(() => {
     if (orderId) {
@@ -135,7 +134,7 @@ export default function OrderConfirmationScreen() {
       </View>
 
       {/* Account Info for Guest Users */}
-      {order?.guestInfo && isAccountCreated && (
+      {order?.guestInfo && (
         <View style={styles.accountInfoSection}>
           <View style={styles.accountInfoHeader}>
             <Text style={styles.accountInfoIcon}>👤</Text>
@@ -156,22 +155,6 @@ export default function OrderConfirmationScreen() {
           </View>
           <Text style={styles.accountInfoNote}>
             💡 Anda boleh log masuk menggunakan maklumat di atas dan tukar kata laluan anda melalui Profil → Tukar Kata Laluan
-          </Text>
-        </View>
-      )}
-
-      {/* Existing Email Info for Guest Users */}
-      {order?.guestInfo && !isAccountCreated && (
-        <View style={styles.existingEmailSection}>
-          <View style={styles.existingEmailHeader}>
-            <Text style={styles.existingEmailIcon}>ℹ️</Text>
-            <Text style={styles.existingEmailTitle}>Email Sudah Wujud</Text>
-          </View>
-          <Text style={styles.existingEmailSubtitle}>
-            Email <Text style={styles.emailHighlight}>{order.guestInfo.email}</Text> sudah mempunyai akaun dalam sistem kami.
-          </Text>
-          <Text style={styles.existingEmailNote}>
-            💡 Log masuk ke akaun anda untuk melihat semua pesanan anda dalam satu tempat. Pergi ke tab Profil untuk log masuk.
           </Text>
         </View>
       )}
@@ -642,43 +625,6 @@ const styles = StyleSheet.create({
     fontFamily: 'monospace',
   },
   accountInfoNote: {
-    fontSize: 14,
-    color: '#666',
-    lineHeight: 20,
-    fontStyle: 'italic',
-  },
-  existingEmailSection: {
-    backgroundColor: '#fff3cd',
-    marginTop: 12,
-    padding: 20,
-    borderLeftWidth: 4,
-    borderLeftColor: '#ffc107',
-  },
-  existingEmailHeader: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: 12,
-  },
-  existingEmailIcon: {
-    fontSize: 24,
-    marginRight: 12,
-  },
-  existingEmailTitle: {
-    fontSize: 20,
-    fontWeight: '600',
-    color: '#856404',
-  },
-  existingEmailSubtitle: {
-    fontSize: 16,
-    color: '#333',
-    marginBottom: 16,
-    lineHeight: 22,
-  },
-  emailHighlight: {
-    fontWeight: '600',
-    color: '#856404',
-  },
-  existingEmailNote: {
     fontSize: 14,
     color: '#666',
     lineHeight: 20,

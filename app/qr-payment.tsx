@@ -17,7 +17,7 @@ import { Order } from '@/types/order';
 const { width } = Dimensions.get('window');
 
 export default function QRPaymentScreen() {
-  const { orderId, accountCreated } = useLocalSearchParams<{ orderId: string; accountCreated?: string }>();
+  const { orderId } = useLocalSearchParams<{ orderId: string }>();
   const [order, setOrder] = useState<Order | null>(null);
   const [loading, setLoading] = useState(true);
   const [confirming, setConfirming] = useState(false);
@@ -75,7 +75,7 @@ export default function QRPaymentScreen() {
       // Navigate to order confirmation
       router.replace({
         pathname: '/order-confirmation',
-        params: { orderId, accountCreated: accountCreated || 'false' }
+        params: { orderId }
       });
     } catch (error) {
       console.error('Error confirming payment:', error);
