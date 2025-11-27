@@ -67,6 +67,9 @@ export default function ProfileScreen() {
       case 'View Orders':
         router.push('/adminOrders');
         break;
+      case 'Business Report':
+        router.push('/businessReport' as any);
+        break;
       default:
         Alert.alert('Tindakan Admin', `Fungsi ${action} akan datang tidak lama lagi!`);
     }
@@ -151,6 +154,13 @@ export default function ProfileScreen() {
             onPress={() => handleAdminAction('View Orders')}
           >
             <Text style={styles.adminButtonText}>Lihat Semua Pesanan</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity 
+            style={styles.adminButton}
+            onPress={() => handleAdminAction('Business Report')}
+          >
+            <Text style={styles.adminButtonText}>Laporan Perniagaan</Text>
           </TouchableOpacity>
         </View>
       )}

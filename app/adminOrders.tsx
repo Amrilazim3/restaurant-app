@@ -257,7 +257,6 @@ export default function AdminOrdersScreen() {
   return (
     <View style={styles.container}>
       <View style={styles.header}>
-        <Text style={styles.title}>Pengurusan Pesanan</Text>
         <View style={styles.statsContainer}>
           <View style={styles.statCard}>
             <Text style={styles.statValue}>{stats.total}</Text>
@@ -377,7 +376,7 @@ const styles = StyleSheet.create({
   header: {
     backgroundColor: '#fff',
     padding: 20,
-    paddingTop: 60,
+    paddingTop: 20,
     borderBottomWidth: 1,
     borderBottomColor: '#eee',
   },

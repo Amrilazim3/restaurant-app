@@ -132,7 +132,7 @@ function RootLayoutNav() {
           name="adminOrders" 
           options={{ 
             title: 'Pengurusan Pesanan',
-            headerShown: false,
+            headerShown: true,
             presentation: 'card'
           }} 
         />
@@ -164,6 +164,14 @@ function RootLayoutNav() {
           name="guestMenu" 
           options={{ 
             title: 'Menu Kami',
+            headerShown: true,
+            presentation: 'card'
+          }} 
+        />
+        <Stack.Screen 
+          name="businessReport" 
+          options={{ 
+            title: 'Laporan Perniagaan',
             headerShown: true,
             presentation: 'card'
           }} 
