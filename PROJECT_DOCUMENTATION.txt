@@ -1,0 +1,1036 @@
+================================================================================
+                    BLOCK TWENTY-9 RESTAURANT APP
+                        PROJECT DOCUMENTATION
+================================================================================
+
+TABLE OF CONTENTS
+-----------------
+1. Introduction
+2. Tech Stack
+3. Development Environment
+4. Feature Process Flows
+5. Building APK with EAS
+6. Project Structure
+7. Conclusion
+
+================================================================================
+1. INTRODUCTION
+================================================================================
+
+Block Twenty-9 is a comprehensive restaurant ordering system mobile application
+built using React Native and Expo. The app allows customers to browse menus,
+place orders, track order status, and make payments. It also includes an admin
+panel for restaurant management including menu and food management, order
+processing, and user management.
+
+================================================================================
+2. TECH STACK
+================================================================================
+
+FRONTEND FRAMEWORK & LIBRARIES:
+--------------------------------
+- React Native 0.79.5
+  * Cross-platform mobile development framework
+  * Allows code sharing between iOS and Android
+
+- Expo SDK 53.0.20
+  * Development platform and toolchain for React Native
+  * Provides pre-built native modules and APIs
+  * Simplifies build and deployment process
+
+- React 19.0.0
+  * JavaScript library for building user interfaces
+  * Component-based architecture
+
+- Expo Router 5.1.4
+  * File-based routing system for Expo apps
+  * Provides navigation similar to Next.js
+
+UI COMPONENTS & STYLING:
+-------------------------
+- Tamagui 1.132.11
+  * Universal design system for React Native
+  * Provides pre-built UI components
+  * Optimized performance with compiled styles
+
+- React Native Reanimated 3.17.4
+  * Animation library for smooth UI animations
+  * Runs animations on UI thread for better performance
+
+- React Native Safe Area Context 5.4.0
+  * Handles safe area insets for different devices
+  * Ensures UI doesn't overlap with notches or status bars
+
+BACKEND & DATABASE:
+-------------------
+- Firebase 11.10.0
+  * Backend-as-a-Service platform
+  * Provides multiple services:
+    - Firebase Authentication (Email/Password)
+    - Cloud Firestore (NoSQL database)
+    - Firebase Storage (Image storage)
+    - Cloud Messaging (Push notifications)
+
+STATE MANAGEMENT:
+-----------------
+- React Context API
+  * Built-in React state management solution
+  * Used for:
+    - Authentication state (AuthContext)
+    - Shopping cart state (CartContext)
+    - Notification state (NotificationContext)
+
+STORAGE:
+--------
+- AsyncStorage 2.1.2
+  * Local storage solution for React Native
+  * Used for persisting cart data and user preferences
+
+NAVIGATION:
+-----------
+- React Navigation 7.1.6
+  * Navigation library for React Native
+  * Provides stack, tab, and drawer navigation
+
+IMAGE HANDLING:
+---------------
+- Expo Image Picker 16.1.4
+  * Allows users to pick images from gallery or camera
+  * Used for profile pictures and food/menu images
+
+- Expo Image Manipulator 13.1.7
+  * Image editing and manipulation
+  * Used for resizing and optimizing images before upload
+
+NOTIFICATIONS:
+--------------
+- Expo Notifications 0.31.4
+  * Push notification system
+  * Handles local and remote notifications
+
+BUILD & DEPLOYMENT:
+-------------------
+- EAS Build (Expo Application Services)
+  * Cloud-based build service
+  * Generates native iOS and Android builds
+  * Configured via eas.json file
+
+DEVELOPMENT TOOLS:
+------------------
+- TypeScript 5.8.3
+  * Typed superset of JavaScript
+  * Provides type safety and better IDE support
+
+- Jest 29.2.1
+  * JavaScript testing framework
+  * Used for unit testing
+
+- Babel 7.25.2
+  * JavaScript compiler
+  * Transpiles modern JavaScript to compatible versions
+
+================================================================================
+3. DEVELOPMENT ENVIRONMENT
+================================================================================
+
+CODE EDITOR:
+------------
+We use Visual Studio Code (VS Code) as our primary code editor for this project.
+
+VS Code provides excellent support for:
+- TypeScript/JavaScript development
+- React Native development with IntelliSense
+- Git integration
+- Extensions for React Native and Expo
+- Integrated terminal
+- Debugging capabilities
+
+KEY VS CODE EXTENSIONS USED:
+- ESLint (Code linting)
+- Prettier (Code formatting)
+- React Native Tools
+- Expo Tools
+- TypeScript and JavaScript Language Features
+
+DEVELOPMENT SETUP:
+------------------
+1. Install Node.js (version 16 or higher)
+2. Install Expo CLI globally: npm install -g expo-cli
+3. Install project dependencies: npm install
+4. Start development server: npx expo start
+5. Use Expo Go app on mobile device to scan QR code and run the app
+
+================================================================================
+4. FEATURE PROCESS FLOWS
+================================================================================
+
+4.1 AUTHENTICATION FEATURE
+---------------------------
+
+REGISTRATION FLOW:
+------------------
+1. User navigates to Register screen (/app/(auth)/register.tsx)
+2. User fills in registration form:
+   - Email address
+   - Password (minimum 6 characters)
+   - Display name
+   - Role selection (User/Admin)
+   - Admin passkey (if registering as admin)
+3. Form validation checks:
+   - Email format validation
+   - Password strength validation
+   - Required field validation
+4. Registration request sent to authService.register()
+5. authService creates user account in Firebase Authentication
+6. User profile created in Firestore 'users' collection with:
+   - uid (from Firebase Auth)
+   - email
+   - displayName
+   - role (admin/user)
+   - createdAt timestamp
+7. If admin role selected, validates admin passkey ('admin123')
+8. On success, user is automatically logged in
+9. AuthContext updates authentication state
+10. User redirected to home screen
+
+LOGIN FLOW:
+-----------
+1. User navigates to Login screen (/app/(auth)/login.tsx)
+2. User enters email and password
+3. Optional "Remember me" checkbox (stores credentials in AsyncStorage)
+4. Login request sent to authService.login()
+5. Firebase Authentication verifies credentials
+6. User profile fetched from Firestore 'users' collection
+7. AuthContext updates with user data and authentication state
+8. User redirected to appropriate screen based on role:
+   - Admin: Admin dashboard
+   - User: Home screen
+
+LOGOUT FLOW:
+------------
+1. User clicks logout button (usually in Profile screen)
+2. authService.logout() called
+3. Firebase signOut() executed
+4. AuthContext clears user data
+5. CartContext clears cart items
+6. User redirected to Login screen
+
+PROFILE MANAGEMENT FLOW:
+------------------------
+1. User navigates to Profile screen (/app/(tabs)/profile.tsx)
+2. Profile information displayed:
+   - Name
+   - Email
+   - Phone number (if available)
+   - Address (if available)
+   - Profile picture (if available)
+3. User clicks "Edit Profile" button
+4. Navigates to Edit Profile screen (/app/editProfile.tsx)
+5. User can update:
+   - Display name
+   - Phone number
+   - Address
+   - Profile picture (using Expo Image Picker)
+6. Image uploaded to Firebase Storage if changed
+7. Profile updated in Firestore via authService.updateProfile()
+8. AuthContext updated with new profile data
+9. User redirected back to Profile screen
+
+CHANGE PASSWORD FLOW:
+---------------------
+1. User navigates to Change Password screen (/app/changePassword.tsx)
+2. User enters:
+   - Current password
+   - New password
+   - Confirm new password
+3. Validation checks:
+   - Current password matches
+   - New password meets requirements
+   - New passwords match
+4. authService.changePassword() called
+5. User re-authenticated with current password
+6. Password updated in Firebase Authentication
+7. Success message displayed
+8. User redirected back to Profile screen
+
+
+4.2 MENU & FOOD BROWSING FEATURE
+---------------------------------
+
+MENU BROWSING FLOW (USER):
+---------------------------
+1. User navigates to Menu screen (/app/(tabs)/menu.tsx)
+2. menuService.getActiveMenus() fetches all active menus from Firestore
+3. Menus displayed in grid/list view with:
+   - Menu name
+   - Description
+   - Menu image
+4. User can search menus by name
+5. User clicks on a menu category
+6. menuService.getAvailableFoodsByMenuId() fetches foods for selected menu
+7. Foods displayed showing:
+   - Food name
+   - Description
+   - Price
+   - Food image
+   - Availability status
+8. User clicks on a food item
+9. Navigates to Food Detail screen (/app/foodDetail.tsx)
+10. Detailed food information displayed:
+    - Full description
+    - Price
+    - Ingredients list
+    - Allergen information
+    - Large food image
+11. User can add food to cart with quantity selection
+
+GUEST MENU BROWSING FLOW:
+-------------------------
+1. Guest user (not logged in) navigates to Guest Menu screen (/app/guestMenu.tsx)
+2. Similar flow to regular menu browsing
+3. When trying to add to cart or checkout, prompted to login or continue as guest
+4. Guest checkout flow available (see Ordering Feature)
+
+SEARCH FUNCTIONALITY:
+---------------------
+1. User enters search term in search bar
+2. menuService.searchFoods() queries Firestore for foods matching search term
+3. Search filters by:
+   - Food name (case-insensitive)
+   - Food description (case-insensitive)
+4. Results displayed in real-time as user types
+5. Only active and available foods shown
+
+
+4.3 ADMIN MENU & FOOD MANAGEMENT FEATURE
+-----------------------------------------
+
+ADMIN MENU MANAGEMENT FLOW:
+----------------------------
+1. Admin navigates to Admin Menus screen (/app/adminMenus.tsx)
+2. menuService.getAllMenus() fetches all menus (including inactive)
+3. Menus displayed in list with:
+   - Menu name
+   - Description
+   - Active/Inactive status
+   - Menu image
+   - Edit/Delete buttons
+4. Admin can:
+   - Create new menu (navigate to /app/adminMenuForm.tsx)
+   - Edit existing menu
+   - Delete menu (soft delete - sets isActive to false)
+   - Toggle menu active status
+
+CREATE MENU FLOW:
+-----------------
+1. Admin clicks "Create Menu" button
+2. Navigates to Admin Menu Form screen (/app/adminMenuForm.tsx)
+3. Admin fills form:
+   - Menu name (required, max 50 characters)
+   - Description (required, max 200 characters)
+   - Menu image (using Expo Image Picker)
+4. Form validation via menuService.validateMenuData()
+5. Image uploaded to Firebase Storage via imageService
+6. menuService.createMenu() creates menu in Firestore 'menus' collection
+7. Menu document created with:
+   - name
+   - description
+   - image (Firebase Storage URL)
+   - isActive (default: true)
+   - createdAt timestamp
+8. Success message displayed
+9. Admin redirected back to Admin Menus screen
+
+EDIT MENU FLOW:
+---------------
+1. Admin clicks "Edit" on a menu item
+2. Navigates to Admin Menu Form with pre-filled data
+3. Admin modifies menu information
+4. If image changed, new image uploaded to Firebase Storage
+5. menuService.updateMenu() updates menu in Firestore
+6. updatedAt timestamp updated
+7. Success message displayed
+8. Admin redirected back to Admin Menus screen
+
+DELETE MENU FLOW:
+-----------------
+1. Admin clicks "Delete" on a menu item
+2. Confirmation dialog displayed
+3. On confirmation, menuService.deleteMenu() called
+4. Menu's isActive field set to false (soft delete)
+5. Menu no longer appears in user-facing menu list
+6. Menu still exists in database for admin reference
+
+ADMIN FOOD MANAGEMENT FLOW:
+----------------------------
+1. Admin navigates to Admin Foods screen (/app/adminFoods.tsx)
+2. menuService.getAllFoods() fetches all foods
+3. Foods displayed organized by menu category
+4. Admin can:
+   - Create new food (navigate to /app/adminFoodForm.tsx)
+   - Edit existing food
+   - Delete food (soft delete)
+   - Toggle food availability
+   - Bulk update food status
+
+CREATE FOOD FLOW:
+-----------------
+1. Admin clicks "Create Food" button
+2. Navigates to Admin Food Form screen (/app/adminFoodForm.tsx)
+3. Admin fills form:
+   - Food name (required, max 100 characters)
+   - Description (required, max 500 characters)
+   - Menu selection (required)
+   - Price (required, must be > 0)
+   - Ingredients (optional)
+   - Allergens (optional)
+   - Food image (using Expo Image Picker)
+   - Availability toggle
+4. Form validation via menuService.validateFoodData()
+5. Image uploaded to Firebase Storage
+6. menuService.createFood() creates food in Firestore 'foods' collection
+7. Food document created with:
+   - name
+   - description
+   - menuId (reference to menu)
+   - price
+   - image (Firebase Storage URL)
+   - ingredients (array)
+   - allergens (array)
+   - isAvailable (default: true)
+   - isActive (default: true)
+   - createdAt timestamp
+8. Success message displayed
+9. Admin redirected back to Admin Foods screen
+
+EDIT FOOD FLOW:
+---------------
+1. Admin clicks "Edit" on a food item
+2. Navigates to Admin Food Form with pre-filled data
+3. Admin modifies food information
+4. If image changed, new image uploaded
+5. menuService.updateFood() updates food in Firestore
+6. updatedAt timestamp updated
+7. Success message displayed
+8. Admin redirected back to Admin Foods screen
+
+DELETE FOOD FLOW:
+-----------------
+1. Admin clicks "Delete" on a food item
+2. Confirmation dialog displayed
+3. On confirmation, menuService.deleteFood() called
+4. Food's isActive field set to false (soft delete)
+5. Food no longer appears in user-facing food list
+6. Food still exists in database for admin reference
+
+TOGGLE AVAILABILITY FLOW:
+--------------------------
+1. Admin toggles availability switch on a food item
+2. menuService.updateFood() updates isAvailable field
+3. Real-time update reflected in UI
+4. If set to unavailable, food no longer appears in user menu browsing
+
+
+4.4 SHOPPING CART FEATURE
+--------------------------
+
+ADD TO CART FLOW:
+-----------------
+1. User views food item (from Menu screen or Food Detail screen)
+2. User selects quantity
+3. User optionally adds special instructions
+4. User clicks "Add to Cart" button
+5. CartContext.addToCart() called with:
+   - Food object
+   - Quantity
+   - Special instructions (optional)
+6. CartContext checks if food already exists in cart:
+   - If exists: Updates quantity of existing item
+   - If new: Adds new item to cart
+7. Cart item created with:
+   - Unique ID (foodId_timestamp)
+   - Food object
+   - Quantity
+   - Special instructions
+   - addedAt timestamp
+8. Cart saved to AsyncStorage for persistence
+9. Cart badge updated showing total item count
+10. Success message/notification displayed
+
+VIEW CART FLOW:
+---------------
+1. User navigates to Cart screen (/app/(tabs)/cart.tsx)
+2. CartContext provides cartItems array
+3. Cart items displayed showing:
+   - Food image
+   - Food name
+   - Quantity (with +/- buttons)
+   - Price per item
+   - Subtotal (price × quantity)
+   - Special instructions (if any)
+4. Cart summary displayed:
+   - Subtotal (sum of all items)
+   - Delivery fee ($2.99)
+   - Tax (8% of subtotal)
+   - Grand total
+5. User can:
+   - Update item quantity
+   - Remove items from cart
+   - Clear entire cart
+   - Proceed to checkout
+
+UPDATE QUANTITY FLOW:
+---------------------
+1. User clicks +/- buttons on cart item
+2. CartContext.updateQuantity() called
+3. If quantity becomes 0, item removed from cart
+4. Cart recalculated
+5. Cart saved to AsyncStorage
+6. UI updated immediately
+
+REMOVE FROM CART FLOW:
+----------------------
+1. User clicks remove/delete button on cart item
+2. CartContext.removeFromCart() called with item ID
+3. Item removed from cartItems array
+4. Cart recalculated
+5. Cart saved to AsyncStorage
+6. UI updated immediately
+
+CLEAR CART FLOW:
+----------------
+1. User clicks "Clear Cart" button
+2. Confirmation dialog displayed
+3. On confirmation, CartContext.clearCart() called
+4. All items removed from cart
+5. AsyncStorage cleared
+6. User redirected or cart screen refreshed
+
+
+4.5 ORDERING & CHECKOUT FEATURE
+---------------------------------
+
+CHECKOUT FLOW (LOGGED IN USER):
+--------------------------------
+1. User navigates to Cart screen with items
+2. User clicks "Proceed to Checkout" button
+3. Navigates to Checkout screen (/app/checkout.tsx)
+4. User information pre-filled from profile:
+   - Name
+   - Email
+   - Phone number (if available)
+   - Address (if available)
+5. User can modify delivery address and contact number
+6. User selects payment method:
+   - Cash on Delivery
+   - QR Code Payment
+7. User can add order notes (optional)
+8. Order summary displayed:
+   - List of items with quantities
+   - Subtotal
+   - Delivery fee ($2.99)
+   - Tax (8%)
+   - Grand total
+9. User reviews order and clicks "Place Order"
+10. orderService.createOrder() called with:
+    - User ID (from AuthContext)
+    - Cart items converted to order items
+    - Delivery address
+    - Contact number
+    - Payment method
+    - Order notes
+11. Order summary calculated:
+    - Subtotal (sum of item prices × quantities)
+    - Delivery fee
+    - Tax (8% of subtotal)
+    - Grand total
+12. Order document created in Firestore 'orders' collection with:
+    - userId
+    - items (array of order items)
+    - totalAmount (subtotal)
+    - deliveryFee
+    - tax
+    - grandTotal
+    - deliveryAddress
+    - contactNumber
+    - paymentMethod
+    - orderStatus: 'pending'
+    - paymentConfirmed (true for cash, false for QR)
+    - notes
+    - createdAt timestamp
+    - updatedAt timestamp
+13. Notification sent to admin about new order
+14. Cart cleared via CartContext.clearCart()
+15. User redirected to Order Confirmation screen (/app/order-confirmation.tsx)
+16. Order confirmation displayed with order ID and details
+
+GUEST CHECKOUT FLOW:
+--------------------
+1. Guest user (not logged in) adds items to cart
+2. Guest clicks checkout
+3. Navigates to Checkout screen
+4. Guest fills in:
+   - Name (required)
+   - Email (required)
+   - Phone number (required)
+   - Delivery address (required)
+5. Guest selects payment method
+6. Guest can add order notes
+7. Order placed via orderService.createOrder() with:
+   - guestInfo object (name, email, phone)
+   - No userId (null)
+8. Rest of flow same as logged-in user checkout
+
+QR CODE PAYMENT FLOW:
+---------------------
+1. User selects "QR Code Payment" as payment method
+2. User clicks "Place Order"
+3. Order created with paymentConfirmed: false
+4. User redirected to QR Payment screen (/app/qr-payment.tsx)
+5. QR code displayed (representing order ID and amount)
+6. User scans QR code with payment app
+7. User completes payment externally
+8. Admin confirms payment in admin panel
+9. orderService.confirmPayment() updates order:
+   - paymentConfirmed: true
+   - updatedAt timestamp updated
+10. Notification sent to user about payment confirmation
+
+
+4.6 ORDER MANAGEMENT & TRACKING FEATURE
+---------------------------------------
+
+USER ORDER TRACKING FLOW:
+--------------------------
+1. User navigates to Orders screen (/app/(tabs)/orders.tsx)
+2. orderService.getUserOrders() fetches user's orders from Firestore
+3. Orders displayed in list sorted by date (newest first)
+4. Each order shows:
+   - Order ID
+   - Order date
+   - Order status (pending, confirmed, preparing, ready, completed, cancelled)
+   - Total amount
+   - Number of items
+5. User clicks on an order
+6. Order Details Sheet displayed (/components/OrderDetailsSheet.tsx) showing:
+   - Full order details
+   - List of items with quantities
+   - Delivery address
+   - Contact number
+   - Payment method
+   - Payment status
+   - Order status timeline
+   - Estimated delivery time (if available)
+7. Real-time updates via orderService.subscribeToUserOrders()
+8. Order status changes reflected immediately
+
+ADMIN ORDER MANAGEMENT FLOW:
+----------------------------
+1. Admin navigates to Admin Orders screen (/app/adminOrders.tsx)
+2. orderService.getAllOrders() fetches all orders from Firestore
+3. Orders displayed in list sorted by date (newest first)
+4. Admin can filter orders by status:
+   - All orders
+   - Pending
+   - Confirmed
+   - Preparing
+   - Ready
+   - Completed
+   - Cancelled
+5. Each order shows:
+   - Order ID
+   - Customer name (or guest info)
+   - Order date and time
+   - Order status
+   - Total amount
+   - Number of items
+6. Admin clicks on an order
+7. Order Details Sheet displayed with full order information
+8. Admin can update order status:
+   - Click status update button
+   - Select new status from dropdown
+   - Optionally set estimated delivery time
+   - Click "Update Status"
+9. orderService.updateOrderStatus() updates order in Firestore:
+   - orderStatus updated
+   - estimatedDeliveryTime updated (if provided)
+   - updatedAt timestamp updated
+10. Notification sent to user about status change
+11. Real-time updates via orderService.subscribeToAllOrders()
+12. All admins see status changes immediately
+
+ORDER STATUS FLOW:
+------------------
+Order progresses through these statuses:
+1. pending - Order just placed, awaiting confirmation
+2. confirmed - Order confirmed by admin, payment verified
+3. preparing - Kitchen is preparing the order
+4. ready - Order is ready for pickup/delivery
+5. completed - Order delivered/picked up
+6. cancelled - Order cancelled (by admin or user)
+
+Each status change triggers:
+- Firestore update
+- Notification to user
+- Real-time UI update for all connected clients
+
+
+4.7 NOTIFICATION FEATURE
+-------------------------
+
+PUSH NOTIFICATION SETUP:
+------------------------
+1. App requests notification permissions on first launch
+2. Expo Notifications registers device for push notifications
+3. Device token obtained and stored
+4. Token sent to Firebase Cloud Messaging (FCM)
+
+NOTIFICATION TYPES:
+-------------------
+1. NEW ORDER NOTIFICATION (Admin):
+   - Triggered when new order created
+   - Sent to all admin users
+   - Contains order ID and customer info
+
+2. ORDER STATUS UPDATE NOTIFICATION (User):
+   - Triggered when admin updates order status
+   - Sent to order owner (user or guest)
+   - Contains order ID and new status
+
+3. PAYMENT CONFIRMATION NOTIFICATION (User):
+   - Triggered when payment confirmed
+   - Sent to order owner
+   - Contains order ID and payment confirmation
+
+NOTIFICATION FLOW:
+------------------
+1. Event occurs (new order, status change, payment confirmation)
+2. notificationService method called:
+   - notifyNewOrder()
+   - notifyOrderStatusChange()
+   - notifyPaymentConfirmed()
+3. Notification data prepared:
+   - Title
+   - Body message
+   - Data payload (order ID, status, etc.)
+4. Notification sent via Firebase Cloud Messaging
+5. Device receives notification
+6. Notification displayed to user
+7. User taps notification
+8. App opens to relevant screen (Orders screen or Order Details)
+
+
+4.8 IMAGE HANDLING FEATURE
+---------------------------
+
+IMAGE UPLOAD FLOW:
+------------------
+1. User/Admin selects image source:
+   - Camera (using Expo Image Picker)
+   - Photo library (using Expo Image Picker)
+2. Image selected and returned as URI
+3. Image preview displayed in UI
+4. Optional image manipulation:
+   - Resize image (using Expo Image Manipulator)
+   - Compress image
+   - Crop image
+5. imageService.uploadImage() called with:
+   - Image URI
+   - Storage path (e.g., 'menus/', 'foods/', 'profiles/')
+   - File name
+6. Image converted to blob
+7. Image uploaded to Firebase Storage
+8. Upload progress tracked
+9. Download URL obtained from Firebase Storage
+10. URL stored in Firestore document (menu, food, or user profile)
+11. Image displayed in app using URL
+
+IMAGE DISPLAY FLOW:
+-------------------
+1. Component receives image URL from Firestore
+2. Expo Image component loads image
+3. Placeholder shown while loading
+4. Image displayed when loaded
+5. Error handling if image fails to load
+
+
+================================================================================
+5. BUILDING APK WITH EAS (EXPO APPLICATION SERVICES)
+================================================================================
+
+OVERVIEW:
+---------
+EAS (Expo Application Services) is a cloud-based build service that allows us
+to generate native Android APK files from our Expo project. The build
+configuration is defined in the eas.json file.
+
+EAS.JSON CONFIGURATION:
+-----------------------
+Our eas.json file contains three build profiles:
+
+1. DEVELOPMENT BUILD:
+   - Purpose: For testing during development
+   - Distribution: Internal (for team testing)
+   - Android Build Type: APK
+   - iOS Resource Class: m1-medium
+   - Includes development client for testing
+
+2. PREVIEW BUILD:
+   - Purpose: For preview/testing before production
+   - Distribution: Internal
+   - Android Build Type: APK
+   - iOS Resource Class: m1-medium
+   - Production-like build for testing
+
+3. PRODUCTION BUILD:
+   - Purpose: For app store release
+   - Distribution: App stores (Google Play, App Store)
+   - iOS Resource Class: m1-medium
+   - Android: Uses default AAB format for Play Store
+
+PREREQUISITES:
+--------------
+1. Expo account (free account works)
+2. EAS CLI installed globally:
+   npm install -g eas-cli
+
+3. Logged into Expo account:
+   eas login
+
+4. EAS project initialized (already done):
+   eas init
+
+BUILD PROCESS FOR ANDROID APK:
+--------------------------------
+
+STEP 1: PREPARE FOR BUILD
+--------------------------
+1. Ensure all code changes are committed
+2. Update app version in app.json if needed
+3. Ensure eas.json is properly configured
+
+STEP 2: START THE BUILD
+-----------------------
+Run one of these commands based on your build profile:
+
+For Development Build:
+  eas build --platform android --profile development
+
+For Preview Build:
+  eas build --platform android --profile preview
+
+For Production Build:
+  eas build --platform android --profile production
+
+STEP 3: BUILD PROCESS
+---------------------
+1. EAS CLI uploads your project to Expo servers
+2. EAS analyzes your project configuration
+3. EAS creates a build environment in the cloud
+4. Dependencies are installed
+5. Native code is compiled
+6. APK/AAB file is generated
+7. Build progress can be monitored via:
+   - Terminal output
+   - Expo dashboard (https://expo.dev)
+
+STEP 4: DOWNLOAD APK
+--------------------
+1. Build completes (usually takes 10-20 minutes)
+2. Download link provided in terminal
+3. Or download from Expo dashboard:
+   - Go to https://expo.dev
+   - Navigate to your project
+   - Click on "Builds" tab
+   - Find your build
+   - Click "Download" button
+
+STEP 5: INSTALL APK
+-------------------
+1. Transfer APK file to Android device
+2. Enable "Install from Unknown Sources" in device settings
+3. Open APK file on device
+4. Follow installation prompts
+5. App installed and ready to use
+
+BUILD CONFIGURATION DETAILS:
+----------------------------
+
+From eas.json - Development Profile:
+{
+  "development": {
+    "developmentClient": true,    // Includes Expo Dev Client
+    "distribution": "internal",   // Internal distribution only
+    "android": {
+      "buildType": "apk"          // Generates APK file
+    }
+  }
+}
+
+From eas.json - Preview Profile:
+{
+  "preview": {
+    "distribution": "internal",   // Internal distribution
+    "android": {
+      "buildType": "apk"          // Generates APK file
+    }
+  }
+}
+
+From eas.json - Production Profile:
+{
+  "production": {
+    "ios": {
+      "resourceClass": "m1-medium" // Uses M1 Mac build servers
+    }
+    // Android defaults to AAB for Play Store
+  }
+}
+
+IMPORTANT NOTES:
+----------------
+1. APK vs AAB:
+   - APK: Direct install file, used for development/preview
+   - AAB: Android App Bundle, required for Google Play Store
+   - Our preview/development profiles generate APK
+   - Production profile generates AAB for Play Store
+
+2. Build Time:
+   - First build: 15-25 minutes (dependencies download)
+   - Subsequent builds: 10-20 minutes
+   - Depends on project size and server load
+
+3. Build Limits:
+   - Free Expo account: Limited builds per month
+   - Paid plans: More builds available
+
+4. Environment Variables:
+   - Can be set in eas.json or via EAS secrets
+   - Useful for API keys and configuration
+
+5. Build History:
+   - All builds stored in Expo dashboard
+   - Can download previous builds
+   - Build logs available for debugging
+
+TROUBLESHOOTING:
+----------------
+1. Build Fails:
+   - Check build logs in Expo dashboard
+   - Verify eas.json configuration
+   - Ensure all dependencies are compatible
+   - Check for syntax errors in code
+
+2. APK Not Installing:
+   - Verify APK is for correct architecture (arm64-v8a, armeabi-v7a, x86)
+   - Check Android version compatibility
+   - Ensure device allows unknown sources
+
+3. Build Takes Too Long:
+   - Normal for first build
+   - Check Expo server status
+   - Consider upgrading EAS plan for faster builds
+
+ALTERNATIVE: LOCAL BUILD (ADVANCED):
+------------------------------------
+For faster builds or more control, you can build locally:
+
+1. Install Android SDK and build tools
+2. Run: eas build --platform android --profile preview --local
+3. Requires more setup but faster builds
+
+================================================================================
+6. PROJECT STRUCTURE
+================================================================================
+
+/app                          # Main application screens
+  /(auth)                    # Authentication screens
+    login.tsx                # Login screen
+    register.tsx             # Registration screen
+  /(tabs)                    # Tab navigation screens
+    index.tsx                # Home screen
+    menu.tsx                 # Menu browsing screen
+    cart.tsx                 # Shopping cart screen
+    orders.tsx               # Order history screen
+    profile.tsx              # User profile screen
+  adminFoods.tsx             # Admin food management
+  adminFoodForm.tsx          # Create/edit food form
+  adminMenus.tsx             # Admin menu management
+  adminMenuForm.tsx          # Create/edit menu form
+  adminOrders.tsx            # Admin order management
+  checkout.tsx               # Checkout screen
+  editProfile.tsx            # Edit profile screen
+  foodDetail.tsx             # Food detail screen
+  order-confirmation.tsx     # Order confirmation screen
+  qr-payment.tsx             # QR payment screen
+  changePassword.tsx          # Change password screen
+  guestMenu.tsx              # Guest menu browsing
+
+/components                   # Reusable UI components
+  Button.tsx                 # Custom button component
+  Card.tsx                   # Card component
+  LoadingSpinner.tsx         # Loading indicator
+  OrderDetailsSheet.tsx      # Order details modal
+  StatusUpdateDialog.tsx     # Status update dialog
+  NotificationBadge.tsx     # Notification badge
+
+/contexts                    # React Context providers
+  AuthContext.tsx            # Authentication state
+  CartContext.tsx            # Shopping cart state
+  NotificationContext.tsx    # Notification state
+
+/services                    # Business logic services
+  authService.ts             # Authentication operations
+  firebase.ts                # Firebase configuration
+  imageService.ts            # Image upload/management
+  menuService.ts             # Menu/food operations
+  orderService.ts            # Order operations
+  notificationService.ts     # Push notifications
+
+/types                       # TypeScript type definitions
+  auth.ts                    # Authentication types
+  menu.ts                    # Menu/food types
+  order.ts                   # Order types
+  image.ts                   # Image types
+
+/constants                   # App constants
+  Colors.ts                  # Color definitions
+
+/assets                      # Static assets
+  /images                    # Image files
+  /fonts                     # Font files
+
+eas.json                     # EAS build configuration
+app.json                     # Expo app configuration
+package.json                 # NPM dependencies
+tsconfig.json                # TypeScript configuration
+
+================================================================================
+7. CONCLUSION
+================================================================================
+
+This documentation provides a comprehensive overview of the Block Twenty-9
+Restaurant App development process, from the technology stack used to the
+detailed feature flows and APK generation process.
+
+The app successfully implements:
+- User authentication and profile management
+- Menu and food browsing with search
+- Shopping cart functionality
+- Order placement and tracking
+- Admin panel for restaurant management
+- Real-time notifications
+- Image handling and storage
+
+The use of modern technologies like React Native, Expo, and Firebase ensures
+a scalable, maintainable, and performant application that works seamlessly
+across iOS and Android platforms.
+
+For building the APK, EAS provides a streamlined cloud-based solution that
+eliminates the need for local Android SDK setup, making it accessible for
+developers at all levels.
+
+================================================================================
+                        END OF DOCUMENTATION
+================================================================================
+
