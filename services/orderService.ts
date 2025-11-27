@@ -227,14 +227,14 @@ class OrderService {
       await updateDoc(doc(db, ORDERS_COLLECTION, orderId), updateData);
       
       // Send notification for status change
-      try {
-        const order = await this.getOrderById(orderId);
-        if (order) {
-          await notificationService.notifyOrderStatusChange(order, status);
-        }
-      } catch (error) {
-        console.error('Failed to send order status notification:', error);
-      }
+    //   try {
+    //     const order = await this.getOrderById(orderId);
+        // if (order) {
+        //   await notificationService.notifyOrderStatusChange(order, status);
+        // }
+    //   } catch (error) {
+    //     console.error('Failed to send order status notification:', error);
+    //   }
     } catch (error) {
       console.error('Error updating order status:', error);
       throw new Error('Failed to update order status. Please try again.');

@@ -257,7 +257,7 @@ class NotificationService {
   }
 
   /**
-   * Handle new order notifications for admin
+   * Handle new order notifications for user
    */
   async notifyNewOrder(order: Order): Promise<void> {
     const customerName = order.guestInfo?.fullName || 'Pelanggan Berdaftar';
@@ -265,8 +265,8 @@ class NotificationService {
     const notification: NotificationData = {
       orderId: order.id,
       type: 'new_order',
-      title: 'Pesanan Baharu',
-      message: `Pesanan baharu daripada ${customerName} - RM${order.grandTotal.toFixed(2)}`,
+      title: 'Pesanan Berjaya Dibuat',
+      message: `Anda telah berjaya membuat pesanan - RM${order.grandTotal.toFixed(2)}`,
       data: {
         orderId: order.id,
         type: 'new_order',

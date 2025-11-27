@@ -370,7 +370,7 @@ export default function CheckoutScreen() {
         ]} />
       </TouchableOpacity>
 
-      <TouchableOpacity
+      {/* <TouchableOpacity
         style={[
           styles.paymentOption,
           paymentMethod === 'qr_code' && styles.selectedPayment
@@ -387,7 +387,7 @@ export default function CheckoutScreen() {
           styles.radioButton,
           paymentMethod === 'qr_code' && styles.radioSelected
         ]} />
-      </TouchableOpacity>
+      </TouchableOpacity> */}
     </View>
   );
 
