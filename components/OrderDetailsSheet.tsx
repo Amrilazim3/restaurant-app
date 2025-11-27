@@ -184,7 +184,7 @@ export function OrderDetailsSheet({
 
             {/* Action Buttons */}
             {showAdminActions && (
-              <YStack space="$3" marginTop="$4">
+              <YStack space="$3" marginTop="$4" marginBottom="$4">
                 <Button
                   backgroundColor="$blue10"
                   color="white"
@@ -206,6 +206,8 @@ export function OrderDetailsSheet({
                 )}
               </YStack>
             )}
+
+            <Separator marginVertical="$10" />
           </ScrollView>
         </YStack>
       </Sheet.Frame>
