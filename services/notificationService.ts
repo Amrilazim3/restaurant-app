@@ -2,6 +2,9 @@ import * as Notifications from 'expo-notifications';
 import * as Device from 'expo-device';
 import Constants from 'expo-constants';
 import { Platform } from 'react-native';
+import { OneSignal, LogLevel } from 'react-native-onesignal';
+import { collection, query, where, getDocs } from 'firebase/firestore';
+import { db } from './firebase';
 import { orderService } from './orderService';
 import { Order, OrderStatus } from '@/types/order';
 
@@ -26,10 +29,16 @@ class NotificationService {
   private expoPushToken: string | null = null;
   private isExpoGo: boolean = false;
   private initialized: boolean = false;
+  private oneSignalAppId: string | null = null;
+  private oneSignalRestApiKey: string | null = null;
 
   constructor() {
     // Check if running in Expo Go
     this.isExpoGo = Constants.appOwnership === 'expo';
+    
+    // Get OneSignal credentials from config
+    this.oneSignalAppId = Constants.expoConfig?.extra?.onesignal?.appId || null;
+    this.oneSignalRestApiKey = Constants.expoConfig?.extra?.onesignal?.restApiKey || null;
   }
 
   /**
@@ -39,6 +48,21 @@ class NotificationService {
     if (this.initialized) return;
     
     try {
+      // Initialize OneSignal SDK if App ID is configured
+      if (this.oneSignalAppId && !this.isExpoGo) {
+        try {
+          OneSignal.Debug.setLogLevel(LogLevel.Verbose);
+          OneSignal.initialize(this.oneSignalAppId);
+          
+          // Request push notification permissions
+          OneSignal.Notifications.requestPermission(false);
+          
+          console.log('OneSignal initialized successfully');
+        } catch (error) {
+          console.error('Failed to initialize OneSignal:', error);
+        }
+      }
+
       if (this.isExpoGo) {
         console.log('Running in Expo Go - Push notifications disabled. Use development build for full functionality.');
         // Only setup local notifications for Expo Go
@@ -235,7 +259,23 @@ class NotificationService {
       },
     };
 
+    // Send local notification
     await this.sendLocalNotification(notification);
+
+    // Send push notification to the user who made the order
+    if (order.userId) {
+      try {
+        await this.sendOneSignalPushNotification(
+          [order.userId],
+          notification.title,
+          notification.message,
+          notification.data
+        );
+      } catch (error) {
+        console.error('Failed to send order status push notification:', error);
+        // Continue without throwing - local notification already sent
+      }
+    }
   }
 
   /**
@@ -262,7 +302,8 @@ class NotificationService {
   async notifyNewOrder(order: Order): Promise<void> {
     const customerName = order.guestInfo?.fullName || 'Pelanggan Berdaftar';
     
-    const notification: NotificationData = {
+    // User notification (for the customer who made the order)
+    const userNotification: NotificationData = {
       orderId: order.id,
       type: 'new_order',
       title: 'Pesanan Berjaya Dibuat',
@@ -273,7 +314,51 @@ class NotificationService {
       },
     };
 
-    await this.sendLocalNotification(notification);
+    // Admin notification template
+    const adminNotification: NotificationData = {
+      orderId: order.id,
+      type: 'new_order',
+      title: 'Pesanan Baru Diterima',
+      message: `Pesanan baru dari ${customerName} - RM${order.grandTotal.toFixed(2)}`,
+      data: {
+        orderId: order.id,
+        type: 'new_order',
+      },
+    };
+
+    // Send local notification to user
+    await this.sendLocalNotification(userNotification);
+
+    // Send push notification to the user who made the order
+    if (order.userId) {
+      try {
+        await this.sendOneSignalPushNotification(
+          [order.userId],
+          userNotification.title,
+          userNotification.message,
+          userNotification.data
+        );
+      } catch (error) {
+        console.error('Failed to send new order push notification to user:', error);
+        // Continue without throwing - local notification already sent
+      }
+    }
+
+    // Send push notification to all admin users
+    try {
+      const adminUserIds = await this.getAllAdminUserIds();
+      if (adminUserIds.length > 0) {
+        await this.sendOneSignalPushNotification(
+          adminUserIds,
+          adminNotification.title,
+          adminNotification.message,
+          adminNotification.data
+        );
+      }
+    } catch (error) {
+      console.error('Failed to send new order push notification to admins:', error);
+      // Continue without throwing - user notification already sent
+    }
   }
 
   /**
@@ -354,6 +439,112 @@ class NotificationService {
     
     // You can implement navigation logic here
     // For example: router.push(`/order-detail/${data.orderId}`);
+  }
+
+  /**
+   * Get all admin user IDs from Firestore
+   */
+  private async getAllAdminUserIds(): Promise<string[]> {
+    try {
+      const q = query(
+        collection(db, 'users'),
+        where('role', '==', 'admin')
+      );
+      
+      const querySnapshot = await getDocs(q);
+      const adminIds: string[] = [];
+      
+      querySnapshot.forEach((doc) => {
+        adminIds.push(doc.id);
+      });
+      
+      return adminIds;
+    } catch (error) {
+      console.error('Error fetching admin users:', error);
+      return [];
+    }
+  }
+
+  /**
+   * Send push notification via OneSignal REST API
+   */
+  private async sendOneSignalPushNotification(
+    externalUserIds: string[],
+    title: string,
+    message: string,
+    data?: any
+  ): Promise<void> {
+    if (!this.oneSignalAppId || !this.oneSignalRestApiKey) {
+      console.log('OneSignal credentials not configured, skipping push notification');
+      return;
+    }
+
+    if (externalUserIds.length === 0) {
+      console.log('No user IDs provided, skipping push notification');
+      return;
+    }
+
+    try {
+      const notificationPayload = {
+        app_id: this.oneSignalAppId,
+        include_external_user_ids: externalUserIds,
+        headings: { en: title },
+        contents: { en: message },
+        data: data || {},
+      };
+
+      const response = await fetch('https://onesignal.com/api/v1/notifications', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Basic ${this.oneSignalRestApiKey}`,
+        },
+        body: JSON.stringify(notificationPayload),
+      });
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(`OneSignal API error: ${response.status} - ${errorText}`);
+      }
+
+      const result = await response.json();
+      console.log('OneSignal push notification sent successfully:', result);
+    } catch (error) {
+      console.error('Error sending OneSignal push notification:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * Set external user ID in OneSignal
+   */
+  async setOneSignalExternalUserId(userId: string): Promise<void> {
+    if (!this.oneSignalAppId || this.isExpoGo) {
+      return;
+    }
+
+    try {
+      await OneSignal.login(userId);
+      console.log('OneSignal external user ID set:', userId);
+    } catch (error) {
+      console.error('Error setting OneSignal external user ID:', error);
+    }
+  }
+
+  /**
+   * Clear external user ID in OneSignal
+   */
+  async clearOneSignalExternalUserId(): Promise<void> {
+    if (!this.oneSignalAppId || this.isExpoGo) {
+      return;
+    }
+
+    try {
+      await OneSignal.logout();
+      console.log('OneSignal external user ID cleared');
+    } catch (error) {
+      console.error('Error clearing OneSignal external user ID:', error);
+    }
   }
 }
 

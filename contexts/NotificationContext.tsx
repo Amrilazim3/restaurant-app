@@ -64,6 +64,27 @@ export const NotificationProvider: React.FC<NotificationProviderProps> = ({ chil
     };
   }, []); // Empty dependency array - only run once
 
+  // Set OneSignal external user ID when user logs in, clear when user logs out
+  useEffect(() => {
+    if (!isInitialized) return;
+
+    const manageOneSignalUserId = async () => {
+      try {
+        if (user) {
+          // User logged in - set external user ID
+          await notificationService.setOneSignalExternalUserId(user.uid);
+        } else {
+          // User logged out - clear external user ID
+          await notificationService.clearOneSignalExternalUserId();
+        }
+      } catch (error) {
+        console.error('Failed to manage OneSignal external user ID:', error);
+      }
+    };
+
+    manageOneSignalUserId();
+  }, [user, isInitialized]);
+
   // Setup notification listeners when user is available
   useEffect(() => {
     if (!user || !isInitialized) return;

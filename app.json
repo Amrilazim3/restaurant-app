@@ -17,9 +17,10 @@
     ],
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "-",
+      "bundleIdentifier": "com.amrilazim_3.restaurantapp",
       "infoPlist": {
-        "ITSAppUsesNonExemptEncryption": false
+        "ITSAppUsesNonExemptEncryption": false,
+        "UIBackgroundModes": ["remote-notification"]
       }
     },
     "android": {
@@ -35,6 +36,14 @@
       "favicon": "./assets/images/block-twenty-9-icon.png"
     },
     "plugins": [
+      [
+        "onesignal-expo-plugin",
+        {
+          "mode": "development",
+          "devTeam": "",
+          "iPhoneDeploymentTarget": "15.0"
+        }
+      ],
       "expo-router",
       [
         "expo-notifications",
@@ -53,6 +62,10 @@
       },
       "firebase": {
         "projectId": "retaurant-block-twenty-9"
+      },
+      "onesignal": {
+        "appId": "2bd08d52-0810-4f32-9ec7-ec77c432febd",
+        "restApiKey": "os_v2_app_fpii2uqicbhtfhwh5r34imx6xv4cpiw4pmpeps4ueihbysgr4o5tvbkbsenu7kanvrslrr67mqe52koyawq2bw7imcussm5mmt7u64i"
       },
       "router": {}
     },
