@@ -42,6 +42,35 @@ class NotificationService {
   }
 
   /**
+   * Base64 encode a string (React Native compatible)
+   */
+  private base64Encode(str: string): string {
+    // Try using btoa if available (polyfilled in some React Native environments)
+    if (typeof btoa !== 'undefined') {
+      return btoa(str);
+    }
+    
+    // Fallback: manual base64 encoding
+    const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=';
+    let output = '';
+    
+    for (let i = 0; i < str.length; i += 3) {
+      const a = str.charCodeAt(i);
+      const b = str.charCodeAt(i + 1) || 0;
+      const c = str.charCodeAt(i + 2) || 0;
+      
+      const bitmap = (a << 16) | (b << 8) | c;
+      
+      output += chars.charAt((bitmap >> 18) & 63);
+      output += chars.charAt((bitmap >> 12) & 63);
+      output += i + 1 < str.length ? chars.charAt((bitmap >> 6) & 63) : '=';
+      output += i + 2 < str.length ? chars.charAt(bitmap & 63) : '=';
+    }
+    
+    return output;
+  }
+
+  /**
    * Initialize notification service
    */
   async initialize(): Promise<void> {
@@ -268,9 +297,6 @@ class NotificationService {
       },
     };
 
-    // Send local notification
-    await this.sendLocalNotification(notification);
-
     // Send push notification to the user who made the order
     if (order.userId) {
       try {
@@ -282,7 +308,6 @@ class NotificationService {
         );
       } catch (error) {
         console.error('Failed to send order status push notification:', error);
-        // Continue without throwing - local notification already sent
       }
     }
   }
@@ -502,14 +527,11 @@ class NotificationService {
         data: data || {},
       };
 
-      // OneSignal requires Basic auth with base64-encoded REST API key
-      const encodedApiKey = Buffer.from(`${this.oneSignalRestApiKey}:`).toString('base64');
-      
       const response = await fetch('https://onesignal.com/api/v1/notifications', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Basic ${encodedApiKey}`,
+          'Authorization': `Basic ${this.oneSignalRestApiKey}`,
         },
         body: JSON.stringify(notificationPayload),
       });
