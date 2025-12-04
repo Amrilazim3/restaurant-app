@@ -22,6 +22,7 @@ export interface NotificationData {
   type: 'order_status' | 'payment_confirmed' | 'new_order' | 'general';
   title: string;
   message: string;
+  path?: string; // Navigation path when notification is tapped
   data?: any;
 }
 
@@ -214,11 +215,17 @@ class NotificationService {
    */
   async sendLocalNotification(data: NotificationData): Promise<void> {
     try {
+      // Ensure path is included in notification data
+      const notificationData = {
+        ...data.data,
+        path: data.path || data.data?.path, // Include path in data
+      };
+
       await Notifications.scheduleNotificationAsync({
         content: {
           title: data.title,
           body: data.message,
-          data: data.data,
+          data: notificationData,
         },
         trigger: null, // Show immediately
       });
@@ -290,10 +297,12 @@ class NotificationService {
       type: 'order_status',
       title: `Pesanan #${order.id?.slice(-8).toUpperCase()}`,
       message: statusMessages[newStatus],
+      path: `/(tabs)/orders`, // Navigate to orders tab when tapped
       data: {
         orderId: order.id,
         status: newStatus,
         type: 'order_status',
+        path: `/(tabs)/orders`, // Include path in data for OneSignal
       },
     };
 
@@ -321,9 +330,11 @@ class NotificationService {
       type: 'payment_confirmed',
       title: 'Pembayaran Disahkan',
       message: `Pembayaran untuk pesanan #${order.id?.slice(-8).toUpperCase()} telah disahkan`,
+      path: `/order-confirmation?orderId=${order.id}`, // Navigate to order confirmation
       data: {
         orderId: order.id,
         type: 'payment_confirmed',
+        path: `/order-confirmation?orderId=${order.id}`, // Include path in data for OneSignal
       },
     };
 
@@ -342,9 +353,11 @@ class NotificationService {
       type: 'new_order',
       title: 'Pesanan Berjaya Dibuat',
       message: `Anda telah berjaya membuat pesanan - RM${order.grandTotal.toFixed(2)}`,
+      path: `/(tabs)/orders`, // Navigate to orders tab when tapped
       data: {
         orderId: order.id,
         type: 'new_order',
+        path: `/(tabs)/orders`, // Include path in data for OneSignal
       },
     };
 
@@ -354,9 +367,11 @@ class NotificationService {
       type: 'new_order',
       title: 'Pesanan Baru Diterima',
       message: `Pesanan baru dari ${customerName} - RM${order.grandTotal.toFixed(2)}`,
+      path: `/adminOrders`, // Navigate to admin orders when tapped
       data: {
         orderId: order.id,
         type: 'new_order',
+        path: `/adminOrders`, // Include path in data for OneSignal
       },
     };
 
@@ -443,20 +458,31 @@ class NotificationService {
     notificationListener: Notifications.EventSubscription;
     responseListener: Notifications.EventSubscription;
   } {
+    console.log('🔧 [NotificationService] Setting up notification listeners...');
+    
     const notificationListener = Notifications.addNotificationReceivedListener(notification => {
-      console.log('Notification received:', notification);
+      console.log('📬 [NotificationService] Notification received:', {
+        title: notification.request.content.title,
+        body: notification.request.content.body,
+        data: notification.request.content.data,
+      });
     });
 
     const responseListener = Notifications.addNotificationResponseReceivedListener(response => {
-      console.log('Notification response:', response);
-      
       const data = response.notification.request.content.data;
-      if (data?.type === 'order_status' || data?.type === 'new_order') {
-        // Handle navigation based on notification type
-        this.handleNotificationPress(data);
-      }
+      console.log('👆 [NotificationService] Notification tapped:', {
+        type: data?.type,
+        orderId: data?.orderId,
+        path: data?.path,
+        fullData: data,
+      });
+      
+      // Navigation is handled in NotificationContext
+      // This listener is kept for logging purposes
     });
 
+    console.log('✅ [NotificationService] Notification listeners set up successfully');
+    
     return {
       notificationListener,
       responseListener,
@@ -465,14 +491,25 @@ class NotificationService {
 
   /**
    * Handle notification press actions
+   * Returns the navigation path from notification data
    */
-  private handleNotificationPress(data: any): void {
-    // This would integrate with your navigation system
-    // For now, we'll just log the action
-    console.log('Handling notification press:', data);
+  getNotificationPath(data: any): string | null {
+    // Priority: use path from data, then determine from type
+    if (data?.path) {
+      return data.path;
+    }
     
-    // You can implement navigation logic here
-    // For example: router.push(`/order-detail/${data.orderId}`);
+    // Fallback: determine path based on notification type
+    if (data?.type === 'order_status' && data?.orderId) {
+      return `/(tabs)/orders`;
+    } else if (data?.type === 'new_order' && data?.orderId) {
+      // This will be handled differently for admin vs user in NotificationContext
+      return `/(tabs)/orders`;
+    } else if (data?.type === 'payment_confirmed' && data?.orderId) {
+      return `/order-confirmation?orderId=${data.orderId}`;
+    }
+    
+    return null;
   }
 
   /**

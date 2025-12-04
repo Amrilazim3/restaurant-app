@@ -95,6 +95,12 @@ export const NotificationProvider: React.FC<NotificationProviderProps> = ({ chil
 
         // Handle received notifications
         const notificationReceivedListener = Notifications.addNotificationReceivedListener((notification: Notifications.Notification) => {
+          console.log('📬 [NotificationContext] Notification received:', {
+            title: notification.request.content.title,
+            body: notification.request.content.body,
+            data: notification.request.content.data,
+          });
+          
           const data = notification.request.content.data;
           const newNotification: NotificationData = {
             orderId: data?.orderId as string,
@@ -111,6 +117,12 @@ export const NotificationProvider: React.FC<NotificationProviderProps> = ({ chil
         // Handle notification responses (when user taps notification)
         const notificationResponseListener = Notifications.addNotificationResponseReceivedListener((response: Notifications.NotificationResponse) => {
           const data = response.notification.request.content.data;
+          console.log('👆 [NotificationContext] Notification tapped:', {
+            type: data?.type,
+            orderId: data?.orderId,
+            path: data?.path,
+            fullData: data,
+          });
           handleNotificationPress(data);
         });
 
@@ -138,16 +150,36 @@ export const NotificationProvider: React.FC<NotificationProviderProps> = ({ chil
 
   const handleNotificationPress = useCallback((data: any) => {
     try {
+      // Priority: use path from notification data if available
+      if (data?.path) {
+        // Handle query params if path includes them
+        if (data.path.includes('?')) {
+          const [pathname, queryString] = data.path.split('?');
+          const params: Record<string, string> = {};
+          queryString.split('&').forEach((param: string) => {
+            const [key, value] = param.split('=');
+            if (key && value) {
+              params[key] = decodeURIComponent(value);
+            }
+          });
+          router.push({ pathname, params });
+        } else {
+          router.push(data.path as any);
+        }
+        return;
+      }
+
+      // Fallback: determine path based on notification type
       if (data?.type === 'order_status' && data?.orderId) {
-        // Navigate to order details
         router.push('/(tabs)/orders');
       } else if (data?.type === 'new_order' && data?.orderId) {
-        // Navigate to admin orders if user is admin
+        // Navigate to admin orders if user is admin, otherwise user orders
         if (userProfile?.role === 'admin') {
           router.push('/adminOrders');
+        } else {
+          router.push('/(tabs)/orders');
         }
       } else if (data?.type === 'payment_confirmed' && data?.orderId) {
-        // Navigate to order confirmation
         router.push({
           pathname: '/order-confirmation',
           params: { orderId: data.orderId }
