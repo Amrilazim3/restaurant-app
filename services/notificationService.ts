@@ -58,8 +58,14 @@ class NotificationService {
           OneSignal.Notifications.requestPermission(false);
           
           console.log('OneSignal initialized successfully');
+          
+          // Setup local notifications for fallback (doesn't require Firebase)
+          await this.setupLocalNotifications();
+          this.initialized = true;
+          return; // Skip Expo push token registration since we're using OneSignal
         } catch (error) {
           console.error('Failed to initialize OneSignal:', error);
+          // Fall through to setup local notifications
         }
       }
 
@@ -68,7 +74,10 @@ class NotificationService {
         // Only setup local notifications for Expo Go
         await this.setupLocalNotifications();
       } else {
-        await this.registerForPushNotificationsAsync();
+        // Only try Expo push tokens if OneSignal is not configured
+        // This requires Firebase to be set up, which we're not using for push notifications
+        console.log('OneSignal not configured - using local notifications only');
+        await this.setupLocalNotifications();
       }
       this.initialized = true;
     } catch (error) {
@@ -493,11 +502,14 @@ class NotificationService {
         data: data || {},
       };
 
+      // OneSignal requires Basic auth with base64-encoded REST API key
+      const encodedApiKey = Buffer.from(`${this.oneSignalRestApiKey}:`).toString('base64');
+      
       const response = await fetch('https://onesignal.com/api/v1/notifications', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Basic ${this.oneSignalRestApiKey}`,
+          'Authorization': `Basic ${encodedApiKey}`,
         },
         body: JSON.stringify(notificationPayload),
       });
