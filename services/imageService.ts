@@ -108,6 +108,16 @@ export const imageService = {
     return resolveImageUri(selectedImage);
   },
 
+  // Get all placeholder images for a category
+  // Returns an array of URI strings that can be displayed in a picker
+  getAllPlaceholderImages(folder: 'menus' | 'foods'): string[] {
+    const images = PLACEHOLDER_IMAGES[folder];
+    if (images.length === 0) {
+      return ['https://via.placeholder.com/400x300?text=No+Image'];
+    }
+    return images.map(image => resolveImageUri(image));
+  },
+
   // Simulate image upload with placeholder (no actual upload needed)
   async uploadImage(
     uri: string,
