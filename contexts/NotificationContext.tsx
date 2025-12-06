@@ -38,6 +38,7 @@ export const NotificationProvider: React.FC<NotificationProviderProps> = ({ chil
   const [expoPushToken, setExpoPushToken] = useState<string | null>(null);
   const { user, userProfile } = useAuth();
   const cleanupRef = useRef<(() => void) | null>(null);
+  const processedNotificationsRef = useRef<Set<string>>(new Set());
 
   // Initialize notifications only once
   useEffect(() => {
@@ -144,9 +145,33 @@ export const NotificationProvider: React.FC<NotificationProviderProps> = ({ chil
             title: notification.request.content.title,
             body: notification.request.content.body,
             data: notification.request.content.data,
+            identifier: notification.request.identifier,
           });
           
           const data = notification.request.content.data;
+          
+          // Create a unique key to prevent duplicate notifications
+          // Use identifier if available, otherwise use orderId + type + timestamp
+          const uniqueKey = notification.request.identifier || 
+            `${data?.orderId || 'unknown'}-${data?.type || 'general'}-${Date.now()}`;
+          
+          // Skip if we've already processed this notification
+          if (processedNotificationsRef.current.has(uniqueKey)) {
+            console.log('⚠️ [NotificationContext] Skipping duplicate notification:', uniqueKey);
+            return;
+          }
+          
+          // Mark as processed
+          processedNotificationsRef.current.add(uniqueKey);
+          
+          // Clean up old entries (keep only last 100)
+          if (processedNotificationsRef.current.size > 100) {
+            const entries = Array.from(processedNotificationsRef.current);
+            entries.slice(0, entries.length - 100).forEach(key => {
+              processedNotificationsRef.current.delete(key);
+            });
+          }
+          
           const newNotification: NotificationData = {
             orderId: data?.orderId as string,
             type: (data?.type as 'order_status' | 'payment_confirmed' | 'new_order' | 'general') || 'general',
@@ -185,57 +210,129 @@ export const NotificationProvider: React.FC<NotificationProviderProps> = ({ chil
               const notification = event.notification;
               const data = notification.additionalData || {};
               
+              // Extract notification content - OneSignal may structure this differently
+              const title = notification.title || notification.notification?.title || 'Notifikasi';
+              const body = notification.body || notification.notification?.body || '';
+              
               console.log('👆 [NotificationContext] OneSignal notification clicked:', {
                 notificationId: notification.notificationId,
-                title: notification.title,
-                body: notification.body,
+                title: title,
+                body: body,
                 type: data?.type,
                 orderId: data?.orderId,
                 path: data?.path,
                 fullData: data,
+                fullNotification: notification,
               });
+
+              // Ensure path is available in data for navigation
+              const notificationData = {
+                ...data,
+                path: data?.path || notificationService.getNotificationPath(data),
+              };
 
               // Update state
               const newNotification: NotificationData = {
                 orderId: data?.orderId as string,
                 type: (data?.type as 'order_status' | 'payment_confirmed' | 'new_order' | 'general') || 'general',
-                title: notification.title || 'Notifikasi',
-                message: notification.body || '',
-                data: data,
+                title: title,
+                message: body,
+                data: notificationData,
               };
 
               setNotifications(prev => [newNotification, ...prev]);
               
-              // Handle navigation
-              handleNotificationPress(data);
+              // Handle navigation with the complete data including path
+              handleNotificationPress(notificationData);
             };
 
             // OneSignal foreground notification listener
-            const foregroundHandler = (event: any) => {
+            const foregroundHandler = async (event: any) => {
               const notification = event.notification;
               const data = notification.additionalData || {};
               
+              // Extract notification content - OneSignal may structure this differently
+              const title = notification.title || notification.notification?.title || 'Notifikasi';
+              const body = notification.body || notification.notification?.body || '';
+              
               console.log('📬 [NotificationContext] OneSignal notification received (foreground):', {
                 notificationId: notification.notificationId,
-                title: notification.title,
-                body: notification.body,
+                title: title,
+                body: body,
                 type: data?.type,
                 orderId: data?.orderId,
                 path: data?.path,
                 fullData: data,
+                fullNotification: notification,
               });
 
-              // Update state
-              const newNotification: NotificationData = {
-                orderId: data?.orderId as string,
-                type: (data?.type as 'order_status' | 'payment_confirmed' | 'new_order' | 'general') || 'general',
-                title: notification.title || 'Notifikasi',
-                message: notification.body || '',
-                data: data,
-              };
+              // Prevent OneSignal from showing its own notification
+              // We'll display it via Expo Notifications instead for consistent behavior
+              try {
+                // Try preventDefault first (if available)
+                if (typeof event.preventDefault === 'function') {
+                  event.preventDefault();
+                  console.log('✅ [NotificationContext] Prevented OneSignal default notification display');
+                }
+                // Also try to prevent display via the notification object
+                if (event.notification && typeof event.notification.display === 'function') {
+                  // Don't call display() - this prevents OneSignal from showing it
+                }
+              } catch (error) {
+                console.log('⚠️ [NotificationContext] preventDefault not available, OneSignal may show its own notification');
+              }
 
-              setNotifications(prev => [newNotification, ...prev]);
-              setUnreadCount(prev => prev + 1);
+              // Display notification using Expo Notifications so it shows properly with title and body
+              // This ensures consistent display and proper navigation handling
+              // Note: We don't update state here - the Expo notificationReceivedListener will handle it
+              // This prevents duplicate notifications
+              try {
+                const notificationPath = data?.path || notificationService.getNotificationPath(data);
+                
+                // Create a unique identifier based on OneSignal notification ID to prevent duplicates
+                const onesignalNotificationId = notification.notificationId || `onesignal-${Date.now()}`;
+                const uniqueId = `onesignal-${onesignalNotificationId}`;
+                
+                // Check if we've already processed this OneSignal notification
+                if (processedNotificationsRef.current.has(uniqueId)) {
+                  console.log('⚠️ [NotificationContext] Skipping duplicate OneSignal notification:', onesignalNotificationId);
+                  return;
+                }
+                
+                // Mark as processed before displaying
+                processedNotificationsRef.current.add(uniqueId);
+                
+                await Notifications.scheduleNotificationAsync({
+                  content: {
+                    title: title,
+                    body: body,
+                    data: {
+                      ...data,
+                      path: notificationPath,
+                      type: data?.type || 'general',
+                      orderId: data?.orderId,
+                      _onesignalId: onesignalNotificationId, // Mark as OneSignal notification
+                    },
+                  },
+                  trigger: null, // Show immediately
+                  identifier: uniqueId, // Use unique identifier
+                });
+                
+                console.log('✅ [NotificationContext] Expo notification displayed for foreground OneSignal notification');
+              } catch (error) {
+                console.error('❌ [NotificationContext] Error displaying foreground notification via Expo:', error);
+                // If Expo fails, try to let OneSignal show it (if method exists)
+                try {
+                  if (notification && typeof notification.display === 'function') {
+                    notification.display();
+                  }
+                } catch (displayError) {
+                  console.error('Failed to display notification via OneSignal fallback:', displayError);
+                }
+              }
+              
+              // Don't update state here - the Expo notificationReceivedListener will handle it
+              // This prevents duplicate notifications from being added to state
             };
 
             OneSignal.Notifications.addEventListener('click', clickHandler);
