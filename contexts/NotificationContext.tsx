@@ -1,6 +1,8 @@
 import React, { createContext, useContext, useEffect, useState, ReactNode, useCallback, useRef } from 'react';
 import * as Notifications from 'expo-notifications';
 import { router } from 'expo-router';
+import { OneSignal } from 'react-native-onesignal';
+import Constants from 'expo-constants';
 import { notificationService, NotificationData } from '@/services/notificationService';
 import { useAuth } from './AuthContext';
 
@@ -85,69 +87,6 @@ export const NotificationProvider: React.FC<NotificationProviderProps> = ({ chil
     manageOneSignalUserId();
   }, [user, isInitialized]);
 
-  // Setup notification listeners when user is available
-  useEffect(() => {
-    if (!user || !isInitialized) return;
-
-    const setupNotificationListeners = () => {
-      try {
-        const { notificationListener, responseListener } = notificationService.setupNotificationListeners();
-
-        // Handle received notifications
-        const notificationReceivedListener = Notifications.addNotificationReceivedListener((notification: Notifications.Notification) => {
-          console.log('📬 [NotificationContext] Notification received:', {
-            title: notification.request.content.title,
-            body: notification.request.content.body,
-            data: notification.request.content.data,
-          });
-          
-          const data = notification.request.content.data;
-          const newNotification: NotificationData = {
-            orderId: data?.orderId as string,
-            type: (data?.type as 'order_status' | 'payment_confirmed' | 'new_order' | 'general') || 'general',
-            title: notification.request.content.title || 'Notifikasi',
-            message: notification.request.content.body || '',
-            data: data,
-          };
-
-          setNotifications(prev => [newNotification, ...prev]);
-          setUnreadCount(prev => prev + 1);
-        });
-
-        // Handle notification responses (when user taps notification)
-        const notificationResponseListener = Notifications.addNotificationResponseReceivedListener((response: Notifications.NotificationResponse) => {
-          const data = response.notification.request.content.data;
-          console.log('👆 [NotificationContext] Notification tapped:', {
-            type: data?.type,
-            orderId: data?.orderId,
-            path: data?.path,
-            fullData: data,
-          });
-          handleNotificationPress(data);
-        });
-
-        // Cleanup function
-        return () => {
-          notificationListener?.remove();
-          responseListener?.remove();
-          notificationReceivedListener?.remove();
-          notificationResponseListener?.remove();
-        };
-      } catch (error) {
-        console.error('Error setting up notification listeners:', error);
-        return () => {}; // Return empty cleanup function
-      }
-    };
-
-    cleanupRef.current = setupNotificationListeners();
-
-    return () => {
-      if (cleanupRef.current) {
-        cleanupRef.current();
-      }
-    };
-  }, [user, isInitialized]); // Only depend on user and isInitialized
-
   const handleNotificationPress = useCallback((data: any) => {
     try {
       // Priority: use path from notification data if available
@@ -189,6 +128,151 @@ export const NotificationProvider: React.FC<NotificationProviderProps> = ({ chil
       console.error('Error handling notification press:', error);
     }
   }, [userProfile?.role]);
+
+  // Setup notification listeners when user is available
+  useEffect(() => {
+    if (!user || !isInitialized) return;
+
+    const setupNotificationListeners = () => {
+        console.log('📱 [NotificationContext] Setting up notification listeners');
+      try {
+        const { notificationListener, responseListener } = notificationService.setupNotificationListeners();
+
+        // Handle received notifications (Expo)
+        const notificationReceivedListener = Notifications.addNotificationReceivedListener((notification: Notifications.Notification) => {
+          console.log('📬 [NotificationContext] Expo notification received:', {
+            title: notification.request.content.title,
+            body: notification.request.content.body,
+            data: notification.request.content.data,
+          });
+          
+          const data = notification.request.content.data;
+          const newNotification: NotificationData = {
+            orderId: data?.orderId as string,
+            type: (data?.type as 'order_status' | 'payment_confirmed' | 'new_order' | 'general') || 'general',
+            title: notification.request.content.title || 'Notifikasi',
+            message: notification.request.content.body || '',
+            data: data,
+          };
+
+          setNotifications(prev => [newNotification, ...prev]);
+          setUnreadCount(prev => prev + 1);
+        });
+
+        // Handle notification responses (when user taps notification) - Expo
+        const notificationResponseListener = Notifications.addNotificationResponseReceivedListener((response: Notifications.NotificationResponse) => {
+          const data = response.notification.request.content.data;
+          console.log('👆 [NotificationContext] Expo notification tapped:', {
+            type: data?.type,
+            orderId: data?.orderId,
+            path: data?.path,
+            fullData: data,
+          });
+          handleNotificationPress(data);
+        });
+
+        // Set up OneSignal listeners if OneSignal is configured
+        const oneSignalAppId = Constants.expoConfig?.extra?.onesignal?.appId;
+        const isExpoGo = Constants.appOwnership === 'expo';
+        let oneSignalClickCleanup: (() => void) | null = null;
+        let oneSignalForegroundCleanup: (() => void) | null = null;
+
+        if (oneSignalAppId && !isExpoGo) {
+          // Set up OneSignal listeners directly
+          try {
+            // OneSignal notification clicked listener
+            const clickHandler = (event: any) => {
+              const notification = event.notification;
+              const data = notification.additionalData || {};
+              
+              console.log('👆 [NotificationContext] OneSignal notification clicked:', {
+                notificationId: notification.notificationId,
+                title: notification.title,
+                body: notification.body,
+                type: data?.type,
+                orderId: data?.orderId,
+                path: data?.path,
+                fullData: data,
+              });
+
+              // Update state
+              const newNotification: NotificationData = {
+                orderId: data?.orderId as string,
+                type: (data?.type as 'order_status' | 'payment_confirmed' | 'new_order' | 'general') || 'general',
+                title: notification.title || 'Notifikasi',
+                message: notification.body || '',
+                data: data,
+              };
+
+              setNotifications(prev => [newNotification, ...prev]);
+              
+              // Handle navigation
+              handleNotificationPress(data);
+            };
+
+            // OneSignal foreground notification listener
+            const foregroundHandler = (event: any) => {
+              const notification = event.notification;
+              const data = notification.additionalData || {};
+              
+              console.log('📬 [NotificationContext] OneSignal notification received (foreground):', {
+                notificationId: notification.notificationId,
+                title: notification.title,
+                body: notification.body,
+                type: data?.type,
+                orderId: data?.orderId,
+                path: data?.path,
+                fullData: data,
+              });
+
+              // Update state
+              const newNotification: NotificationData = {
+                orderId: data?.orderId as string,
+                type: (data?.type as 'order_status' | 'payment_confirmed' | 'new_order' | 'general') || 'general',
+                title: notification.title || 'Notifikasi',
+                message: notification.body || '',
+                data: data,
+              };
+
+              setNotifications(prev => [newNotification, ...prev]);
+              setUnreadCount(prev => prev + 1);
+            };
+
+            OneSignal.Notifications.addEventListener('click', clickHandler);
+            OneSignal.Notifications.addEventListener('foregroundWillDisplay', foregroundHandler);
+
+            oneSignalClickCleanup = () => OneSignal.Notifications.removeEventListener('click', clickHandler);
+            oneSignalForegroundCleanup = () => OneSignal.Notifications.removeEventListener('foregroundWillDisplay', foregroundHandler);
+            
+            console.log('✅ [NotificationContext] OneSignal listeners set up successfully');
+          } catch (error) {
+            console.error('❌ [NotificationContext] Failed to set up OneSignal listeners:', error);
+          }
+        }
+
+        // Cleanup function
+        return () => {
+          notificationListener?.remove();
+          responseListener?.remove();
+          notificationReceivedListener?.remove();
+          notificationResponseListener?.remove();
+          oneSignalClickCleanup?.();
+          oneSignalForegroundCleanup?.();
+        };
+      } catch (error) {
+        console.error('Error setting up notification listeners:', error);
+        return () => {}; // Return empty cleanup function
+      }
+    };
+
+    cleanupRef.current = setupNotificationListeners();
+
+    return () => {
+      if (cleanupRef.current) {
+        cleanupRef.current();
+      }
+    };
+  }, [user, isInitialized, handleNotificationPress]); // Added handleNotificationPress to dependencies
 
   const markAsRead = useCallback((notificationId: string) => {
     setNotifications(prev => 

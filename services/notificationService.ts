@@ -376,7 +376,7 @@ class NotificationService {
     };
 
     // Send local notification to user
-    await this.sendLocalNotification(userNotification);
+    // await this.sendLocalNotification(userNotification);
 
     // Send push notification to the user who made the order
     if (order.userId) {
@@ -461,7 +461,7 @@ class NotificationService {
     console.log('🔧 [NotificationService] Setting up notification listeners...');
     
     const notificationListener = Notifications.addNotificationReceivedListener(notification => {
-      console.log('📬 [NotificationService] Notification received:', {
+      console.log('📬 [NotificationService] Expo notification received:', {
         title: notification.request.content.title,
         body: notification.request.content.body,
         data: notification.request.content.data,
@@ -470,7 +470,7 @@ class NotificationService {
 
     const responseListener = Notifications.addNotificationResponseReceivedListener(response => {
       const data = response.notification.request.content.data;
-      console.log('👆 [NotificationService] Notification tapped:', {
+      console.log('👆 [NotificationService] Expo notification tapped:', {
         type: data?.type,
         orderId: data?.orderId,
         path: data?.path,
