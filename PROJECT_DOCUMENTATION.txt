@@ -812,6 +812,8 @@ STEP 1: PREPARE FOR BUILD
 STEP 2: START THE BUILD
 -----------------------
 Run one of these commands based on your build profile:
+Use these command:
+npx eas-cli ..... (on macbook)
 
 For Development Build:
   eas build --platform android --profile development
