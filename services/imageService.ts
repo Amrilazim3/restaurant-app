@@ -51,6 +51,9 @@ const PLACEHOLDER_IMAGES: { menus: ImageSource[]; foods: ImageSource[] } = {
     // Local images - Add your local food images here
     // Example: require('@/assets/images/foods/food1.jpg'),
     // Example: require('@/assets/images/foods/food2.jpg'),
+    require('@/assets/images/menus/menu_1.jpg'),
+    require('@/assets/images/menus/menu_2.jpg'),
+    require('@/assets/images/menus/menu_3.jpg'),
     require('@/assets/images/foods/chicken_chop.jpg'),
     require('@/assets/images/foods/daging_kambing.jpg'),
     require('@/assets/images/foods/fish_n_chip.jpg'),
