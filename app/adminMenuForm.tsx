@@ -18,6 +18,7 @@ import { Text, View } from '@/components/Themed';
 import { menuService } from '@/services/menuService';
 import { Menu } from '@/types/menu';
 import { imageService } from '@/services/imageService';
+import { PlaceholderImagePickerModal } from '@/components/PlaceholderImagePickerModal';
 
 interface MenuFormData {
   name: string;
@@ -50,6 +51,8 @@ export default function AdminMenuFormScreen() {
   const [loading, setLoading] = useState(false);
   const [initialLoading, setInitialLoading] = useState(isEditing);
   const [imageUploading, setImageUploading] = useState(false);
+  const [placeholderImages, setPlaceholderImages] = useState<(string | number)[]>([]);
+  const [showPlaceholderModal, setShowPlaceholderModal] = useState(false);
 
   useEffect(() => {
     if (isEditing && id) {
@@ -127,7 +130,7 @@ export default function AdminMenuFormScreen() {
           } else if (buttonIndex === 1) {
             await pickImage('gallery');
           } else if (buttonIndex === 2) {
-            await usePlaceholderImage();
+            openPlaceholderModal();
           }
         }
       );
@@ -135,18 +138,26 @@ export default function AdminMenuFormScreen() {
       Alert.alert('Pilih Gambar', 'Pilih sumber gambar:', [
         { text: 'Ambil Foto', onPress: () => pickImage('camera') },
         { text: 'Pilih dari Galeri', onPress: () => pickImage('gallery') },
-        { text: 'Gunakan Contoh', onPress: () => usePlaceholderImage() },
+        { text: 'Gunakan Contoh', onPress: () => openPlaceholderModal() },
         { text: 'Batal', style: 'cancel' },
       ]);
     }
   };
 
-  const usePlaceholderImage = async () => {
+  const openPlaceholderModal = () => {
+    const images = imageService.getAllPlaceholderImages('menus');
+    console.log('🔍 Placeholder Images:', images);
+    setPlaceholderImages(images);
+    setShowPlaceholderModal(true);
+  };
+
+  const usePlaceholderImage = async (imageUri?: string) => {
     try {
       setImageUploading(true);
       
       const fileName = `menu_${Date.now()}`;
-      const placeholderUrl = imageService.getRandomPlaceholderImage('menus');
+      // Use provided imageUri or fallback to random
+      const placeholderUrl = imageUri || imageService.getRandomPlaceholderImage('menus');
       const placeholderPath = `menus/${Date.now()}_${fileName}.jpg`;
       
       // Simulate upload delay for UX
@@ -163,6 +174,10 @@ export default function AdminMenuFormScreen() {
     } finally {
       setImageUploading(false);
     }
+  };
+
+  const handlePlaceholderImageSelect = (imageUri: string) => {
+    usePlaceholderImage(imageUri);
   };
 
   const pickImage = async (source: 'camera' | 'gallery') => {
@@ -370,7 +385,7 @@ export default function AdminMenuFormScreen() {
         </View>
 
         {/* Menu Image */}
-        <View style={styles.section}>
+        {/* <View style={styles.section}>
           <Text style={styles.label}>Gambar Menu</Text>
           
           {formData.image ? (
@@ -413,7 +428,7 @@ export default function AdminMenuFormScreen() {
               </Text>
             </TouchableOpacity>
           )}
-        </View>
+        </View> */}
 
         {/* Menu Status */}
         <View style={styles.section}>
@@ -436,6 +451,15 @@ export default function AdminMenuFormScreen() {
 
         <View style={styles.bottomPadding} />
       </ScrollView>
+
+    {/* Placeholder Image Picker Modal */}
+    <PlaceholderImagePickerModal
+        visible={showPlaceholderModal}
+        images={placeholderImages}
+        onSelect={handlePlaceholderImageSelect}
+        onClose={() => setShowPlaceholderModal(false)}
+        title="Pilih Gambar Contoh Menu"
+      />
     </KeyboardAvoidingView>
   );
 }
