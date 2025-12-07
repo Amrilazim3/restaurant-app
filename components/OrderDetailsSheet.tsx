@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { ScrollView, TouchableOpacity } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { 
@@ -13,6 +13,8 @@ import {
   Paragraph
 } from 'tamagui';
 import { Order, OrderStatus } from '@/types/order';
+import { authService } from '@/services/authService';
+import { UserProfile } from '@/types/auth';
 
 const ORDER_STATUS_COLORS = {
   pending: '#FF9500',
@@ -49,6 +51,21 @@ export function OrderDetailsSheet({
   onConfirmPayment,
   showAdminActions = true
 }: OrderDetailsSheetProps) {
+  const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
+
+  useEffect(() => {
+    const fetchUserProfile = async () => {
+      if (order?.userId) {
+        const profile = await authService.getUserProfile(order.userId);
+        setUserProfile(profile);
+      } else {
+        setUserProfile(null);
+      }
+    };
+
+    fetchUserProfile();
+  }, [order?.userId]);
+
   if (!order) return null;
 
   const getStatusColor = (status: OrderStatus) => {
@@ -110,17 +127,24 @@ export function OrderDetailsSheet({
               <XStack justifyContent="space-between">
                 <Text color="$gray10">Nama:</Text>
                 <Text fontWeight="bold">
-                  {order.guestInfo ? order.guestInfo.fullName : 'Pelanggan Berdaftar'}
+                  {order.guestInfo 
+                    ? order.guestInfo.fullName 
+                    : userProfile?.displayName || 'Pelanggan Berdaftar'}
                 </Text>
               </XStack>
               <XStack justifyContent="space-between">
                 <Text color="$gray10">No. Telefon:</Text>
                 <Text fontWeight="bold">{order.contactNumber}</Text>
               </XStack>
-              {order.guestInfo && (
+              {order.guestInfo ? (
                 <XStack justifyContent="space-between">
                   <Text color="$gray10">Email:</Text>
                   <Text fontWeight="bold">{order.guestInfo.email}</Text>
+                </XStack>
+              ) : userProfile?.email && (
+                <XStack justifyContent="space-between">
+                  <Text color="$gray10">Email:</Text>
+                  <Text fontWeight="bold">{userProfile.email}</Text>
                 </XStack>
               )}
             </YStack>
