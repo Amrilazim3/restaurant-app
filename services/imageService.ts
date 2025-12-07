@@ -23,31 +23,73 @@ const resolveImageUri = (source: ImageSource): string => {
 // To add local images, use: require('@/assets/images/foods/your-image.jpg')
 const PLACEHOLDER_IMAGES: { menus: ImageSource[]; foods: ImageSource[] } = {
   menus: [
-    // Remote images (existing)
-    'https://images.unsplash.com/photo-1555939594-58d7cb561ad1?w=400&h=300&fit=crop&crop=center',
-    'https://images.unsplash.com/photo-1567620905732-2d1ec7ab7445?w=400&h=300&fit=crop&crop=center',
-    'https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=400&h=300&fit=crop&crop=center',
-    'https://images.unsplash.com/photo-1546833999-b9f581a1996d?w=400&h=300&fit=crop&crop=center',
-    'https://images.unsplash.com/photo-1482049016688-2d3e1b311543?w=400&h=300&fit=crop&crop=center',
+    // Remote images (commented out due to 404 errors - using local images instead)
+    // 'https://images.unsplash.com/photo-1555939594-58d7cb561ad1?w=400&h=300&fit=crop&crop=center',
+    // 'https://images.unsplash.com/photo-1567620905732-2d1ec7ab7445?w=400&h=300&fit=crop&crop=center',
+    // 'https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=400&h=300&fit=crop&crop=center',
+    // 'https://images.unsplash.com/photo-1546833999-b9f581a1996d?w=400&h=300&fit=crop&crop=center',
+    // 'https://images.unsplash.com/photo-1482049016688-2d3e1b311543?w=400&h=300&fit=crop&crop=center',
     // Local images - Add your local menu images here
     // Example: require('@/assets/images/menus/menu1.jpg'),
     // Example: require('@/assets/images/menus/menu2.jpg'),
+    require('@/assets/images/menus/menu_1.jpg'),
+    require('@/assets/images/menus/menu_2.jpg'),
+    require('@/assets/images/menus/menu_3.jpg'),
   ],
   foods: [
-    // Remote images (existing)
-    'https://images.unsplash.com/photo-1565299624946-b28f40a0ca4b?w=400&h=300&fit=crop&crop=center',
-    'https://images.unsplash.com/photo-1571091718767-18b5b1457add?w=400&h=300&fit=crop&crop=center',
-    'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=400&h=300&fit=crop&crop=center',
-    'https://images.unsplash.com/photo-1555939594-58d7cb561ad1?w=400&h=300&fit=crop&crop=center',
-    'https://images.unsplash.com/photo-1567620905732-2d1ec7ab7445?w=400&h=300&fit=crop&crop=center',
-    'https://images.unsplash.com/photo-1565958011703-44f9829ba187?w=400&h=300&fit=crop&crop=center',
-    'https://images.unsplash.com/photo-1540189549336-e6e99c3679fe?w=400&h=300&fit=crop&crop=center',
-    'https://images.unsplash.com/photo-1551782450-a2132b4ba21d?w=400&h=300&fit=crop&crop=center',
-    'https://images.unsplash.com/photo-1551024506-0bccd828d307?w=400&h=300&fit=crop&crop=center',
-    'https://images.unsplash.com/photo-1559181567-c3190ca9959b?w=400&h=300&fit=crop&crop=center',
+    // Remote images (commented out due to 404 errors - using local images instead)
+    // 'https://images.unsplash.com/photo-1565299624946-b28f40a0ca4b?w=400&h=300&fit=crop&crop=center',
+    // 'https://images.unsplash.com/photo-1571091718767-18b5b1457add?w=400&h=300&fit=crop&crop=center',
+    // 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=400&h=300&fit=crop&crop=center',
+    // 'https://images.unsplash.com/photo-1555939594-58d7cb561ad1?w=400&h=300&fit=crop&crop=center',
+    // 'https://images.unsplash.com/photo-1567620905732-2d1ec7ab7445?w=400&h=300&fit=crop&crop=center',
+    // 'https://images.unsplash.com/photo-1565958011703-44f9829ba187?w=400&h=300&fit=crop&crop=center',
+    // 'https://images.unsplash.com/photo-1540189549336-e6e99c3679fe?w=400&h=300&fit=crop&crop=center',
+    // 'https://images.unsplash.com/photo-1551782450-a2132b4ba21d?w=400&h=300&fit=crop&crop=center',
+    // 'https://images.unsplash.com/photo-1551024506-0bccd828d307?w=400&h=300&fit=crop&crop=center',
+    // 'https://images.unsplash.com/photo-1559181567-c3190ca9959b?w=400&h=300&fit=crop&crop=center',
     // Local images - Add your local food images here
     // Example: require('@/assets/images/foods/food1.jpg'),
     // Example: require('@/assets/images/foods/food2.jpg'),
+    require('@/assets/images/foods/chicken_chop.jpg'),
+    require('@/assets/images/foods/daging_kambing.jpg'),
+    require('@/assets/images/foods/fish_n_chip.jpg'),
+    require('@/assets/images/foods/fries.jpg'),
+    require('@/assets/images/foods/kuew_teoy_sayur.jpg'),
+    require('@/assets/images/foods/meatball.jpg'),
+    require('@/assets/images/foods/mee_bandung.jpg'),
+    require('@/assets/images/foods/mee_goreng_mamak.jpg'),
+    require('@/assets/images/foods/mee_goreng_seafood.jpg'),
+    require('@/assets/images/foods/mee_hong_kong.jpg'),
+    require('@/assets/images/foods/mee_hun_goreng.jpg'),
+    require('@/assets/images/foods/nasi_goreng_ayam_goreng.jpg'),
+    require('@/assets/images/foods/nasi_goreng_cina.jpg'),
+    require('@/assets/images/foods/nasi_goreng_daging_2.jpg'),
+    require('@/assets/images/foods/nasi_goreng_daging.jpg'),
+    require('@/assets/images/foods/nasi_goreng_kampung.jpg'),
+    require('@/assets/images/foods/nasi_goreng_paprick.jpg'),
+    require('@/assets/images/foods/nasi_goreng_pataya.jpg'),
+    require('@/assets/images/foods/nasi_goreng_udang.jpg'),
+    require('@/assets/images/foods/nasi_goreng_usa.jpg'),
+    require('@/assets/images/foods/tom_yam_kuah.jpg'),
+    require('@/assets/images/foods/sayur_bayam_kailan.jpg'),
+    require('@/assets/images/foods/sayur_kangkung.jpg'),
+    require('@/assets/images/foods/sayur_paprik.jpg'),
+    // air panas
+    require('@/assets/images/foods/kopi_ais.jpg'),
+    require('@/assets/images/foods/kopi_panas.jpg'),
+    require('@/assets/images/foods/milo_o_panas.jpg'),
+    require('@/assets/images/foods/teh_ais.jpg'),
+    require('@/assets/images/foods/teh_o_ais.jpg'),
+    require('@/assets/images/foods/teh_o_panas.jpg'),
+    require('@/assets/images/foods/teh_tarik.jpg'),
+    // air sejuk
+    require('@/assets/images/foods/limau_ais.jpg'),
+    require('@/assets/images/foods/lemon_juice.jpg'),
+    require('@/assets/images/foods/sirap_bandung_ais.jpg'),
+    require('@/assets/images/foods/tembikai_juice.jpg'),
+    require('@/assets/images/foods/sirap_ais.jpg'),
+    require('@/assets/images/foods/carroct_susu_juice.jpg'),
   ]
 };
 
@@ -109,13 +151,15 @@ export const imageService = {
   },
 
   // Get all placeholder images for a category
-  // Returns an array of URI strings that can be displayed in a picker
-  getAllPlaceholderImages(folder: 'menus' | 'foods'): string[] {
+  // Returns an array of ImageSource objects (string URIs or number for require())
+  getAllPlaceholderImages(folder: 'menus' | 'foods'): ImageSource[] {
     const images = PLACEHOLDER_IMAGES[folder];
     if (images.length === 0) {
       return ['https://via.placeholder.com/400x300?text=No+Image'];
     }
-    return images.map(image => resolveImageUri(image));
+    // Return the sources directly instead of resolving to URIs
+    // This allows the Image component to handle both remote URLs and local require() objects
+    return images;
   },
 
   // Simulate image upload with placeholder (no actual upload needed)

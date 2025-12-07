@@ -68,7 +68,7 @@ export default function AdminFoodFormScreen() {
   const [newIngredient, setNewIngredient] = useState('');
   const [newAllergen, setNewAllergen] = useState('');
   const [showPlaceholderModal, setShowPlaceholderModal] = useState(false);
-  const [placeholderImages, setPlaceholderImages] = useState<string[]>([]);
+  const [placeholderImages, setPlaceholderImages] = useState<(string | number)[]>([]);
 
   useEffect(() => {
     loadInitialData();
@@ -180,6 +180,7 @@ export default function AdminFoodFormScreen() {
 
   const openPlaceholderModal = () => {
     const images = imageService.getAllPlaceholderImages('foods');
+    console.log('🔍 Placeholder Images:', images);
     setPlaceholderImages(images);
     setShowPlaceholderModal(true);
   };

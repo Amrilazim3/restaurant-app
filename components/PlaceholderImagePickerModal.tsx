@@ -10,11 +10,14 @@ import {
   ActivityIndicator,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { Text } from './Themed';
+// import { Text } from './Themed';
+
+// Type for image sources (can be URL string or local require() object)
+type ImageSource = string | number;
 
 interface PlaceholderImagePickerModalProps {
   visible: boolean;
-  images: string[];
+  images: ImageSource[];
   onSelect: (imageUri: string) => void;
   onClose: () => void;
   title?: string;
@@ -29,8 +32,27 @@ export function PlaceholderImagePickerModal({
 }: PlaceholderImagePickerModalProps) {
   const [selectedIndex, setSelectedIndex] = React.useState<number | null>(null);
   const [loading, setLoading] = React.useState(false);
+  const [failedImages, setFailedImages] = React.useState<Set<number>>(new Set());
 
-  const handleSelect = async (imageUri: string, index: number) => {
+  // Reset failed images when modal opens
+  React.useEffect(() => {
+    if (visible) {
+      setFailedImages(new Set());
+    }
+  }, [visible]);
+
+  // Helper function to resolve image source to URI string
+  const resolveImageUri = (source: ImageSource): string => {
+    if (typeof source === 'string') {
+      // It's already a URL string
+      return source;
+    }
+    // It's a local require() object, resolve it to URI
+    const resolved = Image.resolveAssetSource(source);
+    return resolved?.uri || '';
+  };
+
+  const handleSelect = async (imageSource: ImageSource, index: number) => {
     setSelectedIndex(index);
     setLoading(true);
     
@@ -38,6 +60,8 @@ export function PlaceholderImagePickerModal({
     await new Promise(resolve => setTimeout(resolve, 300));
     
     setLoading(false);
+    // Resolve to URI string for the callback
+    const imageUri = resolveImageUri(imageSource);
     onSelect(imageUri);
     onClose();
   };
@@ -65,39 +89,66 @@ export function PlaceholderImagePickerModal({
             contentContainerStyle={styles.imageGrid}
             showsVerticalScrollIndicator={false}
           >
-            {images.map((imageUri, index) => (
-              <TouchableOpacity
-                key={index}
-                style={[
-                  styles.imageContainer,
-                  selectedIndex === index && styles.imageContainerSelected,
-                ]}
-                onPress={() => handleSelect(imageUri, index)}
-                disabled={loading}
-              >
-                <Image
-                  source={{ uri: imageUri }}
-                  style={styles.image}
-                  resizeMode="cover"
-                />
-                {selectedIndex === index && loading && (
-                  <View style={styles.loadingOverlay}>
-                    <ActivityIndicator size="small" color="#fff" />
-                  </View>
-                )}
-                {selectedIndex === index && !loading && (
-                  <View style={styles.selectedOverlay}>
-                    <Ionicons name="checkmark-circle" size={32} color="#007AFF" />
-                  </View>
-                )}
-              </TouchableOpacity>
-            ))}
+            {images.length === 0 ? (
+              <View style={styles.emptyContainer}>
+                <Text style={styles.emptyText}>Tiada gambar tersedia</Text>
+              </View>
+            ) : (
+              images
+                .map((imageSource, index) => ({ imageSource, index }))
+                .filter(({ index }) => !failedImages.has(index))
+                .map(({ imageSource, index }) => {
+                  // Handle both string URIs and local require() objects
+                  // For strings: use { uri: string }
+                  // For numbers (require()): resolve to URI using Image.resolveAssetSource
+                  let imageSourceProp;
+                  if (typeof imageSource === 'string') {
+                    imageSourceProp = { uri: imageSource };
+                  } else {
+                    // For require() results (numbers), resolve to URI
+                    const resolved = Image.resolveAssetSource(imageSource);
+                    imageSourceProp = resolved ? { uri: resolved.uri } : imageSource;
+                  }
+
+                  return (
+                    <TouchableOpacity
+                      key={`image-${index}-${typeof imageSource === 'string' ? imageSource : imageSource}`}
+                      style={[
+                        styles.imageContainer,
+                        selectedIndex === index && styles.imageContainerSelected,
+                      ]}
+                      onPress={() => handleSelect(imageSource, index)}
+                      disabled={loading}
+                    >
+                      <Image
+                        source={imageSourceProp}
+                        style={styles.image}
+                        resizeMode="cover"
+                        onError={() => {
+                          // Silently track failed images and hide them
+                          setFailedImages(prev => new Set(prev).add(index));
+                        }}
+                      />
+                      {selectedIndex === index && loading && (
+                        <View style={styles.loadingOverlay}>
+                          <ActivityIndicator size="small" color="#fff" />
+                        </View>
+                      )}
+                      {selectedIndex === index && !loading && (
+                        <View style={styles.selectedOverlay}>
+                          <Ionicons name="checkmark-circle" size={32} color="#007AFF" />
+                        </View>
+                      )}
+                    </TouchableOpacity>
+                  );
+                })
+            )}
           </ScrollView>
 
           {/* Footer */}
           <View style={styles.footer}>
             <Text style={styles.footerText}>
-              {images.length} gambar tersedia
+              {images.length - failedImages.size} gambar tersedia
             </Text>
           </View>
         </View>
@@ -117,6 +168,7 @@ const styles = StyleSheet.create({
     borderTopLeftRadius: 20,
     borderTopRightRadius: 20,
     maxHeight: '90%',
+    flex: 1,
     paddingBottom: 20,
   },
   header: {
@@ -144,6 +196,7 @@ const styles = StyleSheet.create({
     flexWrap: 'wrap',
     padding: 12,
     justifyContent: 'space-between',
+    minHeight: 200,
   },
   imageContainer: {
     width: '48%',
@@ -184,5 +237,15 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: '#666',
     textAlign: 'center',
+  },
+  emptyContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingVertical: 40,
+  },
+  emptyText: {
+    fontSize: 16,
+    color: '#666',
   },
 });
