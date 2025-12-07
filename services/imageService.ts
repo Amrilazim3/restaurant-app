@@ -1,17 +1,40 @@
 import * as ImagePicker from 'expo-image-picker';
 import { manipulateAsync, SaveFormat } from 'expo-image-manipulator';
+import { Image } from 'react-native';
 import { ImageUploadResult, ImageUploadOptions } from '@/types/image';
 
+// Type for image sources (can be URL string or local require() object)
+type ImageSource = string | number;
+
+// Helper function to resolve image source to URI string
+// Handles both remote URLs (strings) and local images (require() objects)
+const resolveImageUri = (source: ImageSource): string => {
+  if (typeof source === 'string') {
+    // It's already a URL string
+    return source;
+  }
+  // It's a local require() object, resolve it to URI
+  const resolved = Image.resolveAssetSource(source);
+  return resolved?.uri || '';
+};
+
 // Predefined placeholder images for different categories
-const PLACEHOLDER_IMAGES = {
+// Can include both remote URLs (strings) and local images (require() objects)
+// To add local images, use: require('@/assets/images/foods/your-image.jpg')
+const PLACEHOLDER_IMAGES: { menus: ImageSource[]; foods: ImageSource[] } = {
   menus: [
+    // Remote images (existing)
     'https://images.unsplash.com/photo-1555939594-58d7cb561ad1?w=400&h=300&fit=crop&crop=center',
     'https://images.unsplash.com/photo-1567620905732-2d1ec7ab7445?w=400&h=300&fit=crop&crop=center',
     'https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=400&h=300&fit=crop&crop=center',
     'https://images.unsplash.com/photo-1546833999-b9f581a1996d?w=400&h=300&fit=crop&crop=center',
     'https://images.unsplash.com/photo-1482049016688-2d3e1b311543?w=400&h=300&fit=crop&crop=center',
+    // Local images - Add your local menu images here
+    // Example: require('@/assets/images/menus/menu1.jpg'),
+    // Example: require('@/assets/images/menus/menu2.jpg'),
   ],
   foods: [
+    // Remote images (existing)
     'https://images.unsplash.com/photo-1565299624946-b28f40a0ca4b?w=400&h=300&fit=crop&crop=center',
     'https://images.unsplash.com/photo-1571091718767-18b5b1457add?w=400&h=300&fit=crop&crop=center',
     'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=400&h=300&fit=crop&crop=center',
@@ -22,6 +45,9 @@ const PLACEHOLDER_IMAGES = {
     'https://images.unsplash.com/photo-1551782450-a2132b4ba21d?w=400&h=300&fit=crop&crop=center',
     'https://images.unsplash.com/photo-1551024506-0bccd828d307?w=400&h=300&fit=crop&crop=center',
     'https://images.unsplash.com/photo-1559181567-c3190ca9959b?w=400&h=300&fit=crop&crop=center',
+    // Local images - Add your local food images here
+    // Example: require('@/assets/images/foods/food1.jpg'),
+    // Example: require('@/assets/images/foods/food2.jpg'),
   ]
 };
 
@@ -70,10 +96,26 @@ export const imageService = {
   },
 
   // Get random placeholder image for testing
+  // Returns a URI string that works with Image component's { uri: ... } prop
   getRandomPlaceholderImage(folder: 'menus' | 'foods'): string {
     const images = PLACEHOLDER_IMAGES[folder];
+    if (images.length === 0) {
+      // Fallback to a default placeholder if no images available
+      return 'https://via.placeholder.com/400x300?text=No+Image';
+    }
     const randomIndex = Math.floor(Math.random() * images.length);
-    return images[randomIndex];
+    const selectedImage = images[randomIndex];
+    return resolveImageUri(selectedImage);
+  },
+
+  // Get all placeholder images for a category
+  // Returns an array of URI strings that can be displayed in a picker
+  getAllPlaceholderImages(folder: 'menus' | 'foods'): string[] {
+    const images = PLACEHOLDER_IMAGES[folder];
+    if (images.length === 0) {
+      return ['https://via.placeholder.com/400x300?text=No+Image'];
+    }
+    return images.map(image => resolveImageUri(image));
   },
 
   // Simulate image upload with placeholder (no actual upload needed)
@@ -168,8 +210,11 @@ export const imageService = {
   // Get a specific placeholder by category and index
   getPlaceholderImage(folder: 'menus' | 'foods', index?: number): string {
     const images = PLACEHOLDER_IMAGES[folder];
+    if (images.length === 0) {
+      return 'https://via.placeholder.com/400x300?text=No+Image';
+    }
     const targetIndex = index !== undefined ? index % images.length : Math.floor(Math.random() * images.length);
-    return images[targetIndex];
+    return resolveImageUri(images[targetIndex]);
   },
 
   // Get default image URLs for fallback

@@ -15,6 +15,7 @@ import {
 import { router, useLocalSearchParams } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { Text, View } from '@/components/Themed';
+import { PlaceholderImagePickerModal } from '@/components/PlaceholderImagePickerModal';
 import { menuService } from '@/services/menuService';
 import { Food, Menu } from '@/types/menu';
 import { imageService } from '@/services/imageService';
@@ -66,6 +67,8 @@ export default function AdminFoodFormScreen() {
   const [imageUploading, setImageUploading] = useState(false);
   const [newIngredient, setNewIngredient] = useState('');
   const [newAllergen, setNewAllergen] = useState('');
+  const [showPlaceholderModal, setShowPlaceholderModal] = useState(false);
+  const [placeholderImages, setPlaceholderImages] = useState<string[]>([]);
 
   useEffect(() => {
     loadInitialData();
@@ -161,7 +164,7 @@ export default function AdminFoodFormScreen() {
           } else if (buttonIndex === 1) {
             await pickImage('gallery');
           } else if (buttonIndex === 2) {
-            await usePlaceholderImage();
+            openPlaceholderModal();
           }
         }
       );
@@ -169,18 +172,25 @@ export default function AdminFoodFormScreen() {
       Alert.alert('Pilih Gambar', 'Pilih sumber gambar:', [
         { text: 'Ambil Gambar', onPress: () => pickImage('camera') },
         { text: 'Pilih dari Galeri', onPress: () => pickImage('gallery') },
-        { text: 'Guna Gambar Contoh', onPress: () => usePlaceholderImage() },
+        { text: 'Guna Gambar Contoh', onPress: () => openPlaceholderModal() },
         { text: 'Batal', style: 'cancel' },
       ]);
     }
   };
 
-  const usePlaceholderImage = async () => {
+  const openPlaceholderModal = () => {
+    const images = imageService.getAllPlaceholderImages('foods');
+    setPlaceholderImages(images);
+    setShowPlaceholderModal(true);
+  };
+
+  const usePlaceholderImage = async (imageUri?: string) => {
     try {
       setImageUploading(true);
       
       const fileName = `food_${Date.now()}`;
-      const placeholderUrl = imageService.getRandomPlaceholderImage('foods');
+      // Use provided imageUri or fallback to random
+      const placeholderUrl = imageUri || imageService.getRandomPlaceholderImage('foods');
       const placeholderPath = `foods/${Date.now()}_${fileName}.jpg`;
       
       // Simulate upload delay for UX
@@ -197,6 +207,10 @@ export default function AdminFoodFormScreen() {
     } finally {
       setImageUploading(false);
     }
+  };
+
+  const handlePlaceholderImageSelect = (imageUri: string) => {
+    usePlaceholderImage(imageUri);
   };
 
   const pickImage = async (source: 'camera' | 'gallery') => {
@@ -607,6 +621,15 @@ export default function AdminFoodFormScreen() {
 
         <View style={styles.bottomPadding} />
       </ScrollView>
+
+      {/* Placeholder Image Picker Modal */}
+      <PlaceholderImagePickerModal
+        visible={showPlaceholderModal}
+        images={placeholderImages}
+        onSelect={handlePlaceholderImageSelect}
+        onClose={() => setShowPlaceholderModal(false)}
+        title="Pilih Gambar Contoh Makanan"
+      />
     </KeyboardAvoidingView>
   );
 }
