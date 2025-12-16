@@ -107,7 +107,7 @@ export default function FoodDetailScreen() {
       {/* Food Info */}
       <View style={styles.infoContainer}>
         <Text style={styles.foodName}>{food.name}</Text>
-        <Text style={styles.foodPrice}>${food.price.toFixed(2)}</Text>
+        <Text style={styles.foodPrice}>RM{food.price.toFixed(2)}</Text>
         <Text style={styles.foodDescription}>{food.description}</Text>
 
         {/* Cart Status */}
