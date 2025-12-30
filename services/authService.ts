@@ -40,10 +40,28 @@ export const authService = {
         createdAt: new Date()
       };
       
-      await setDoc(doc(db, 'users', user.uid), userProfile);
+      try {
+        await setDoc(doc(db, 'users', user.uid), userProfile);
+      } catch (firestoreError: any) {
+        // Handle Firestore permission errors specifically
+        if (firestoreError?.code === 'permission-denied' || firestoreError?.message?.includes('permission')) {
+          throw new Error('Permission denied: Unable to create user profile. Please ensure Firestore security rules allow users to create their own profile.');
+        }
+        throw firestoreError;
+      }
       
       return userProfile;
-    } catch (error) {
+    } catch (error: any) {
+      // Re-throw with better context for authentication errors
+      if (error?.code === 'auth/email-already-in-use') {
+        throw new Error('An account with this email already exists');
+      } else if (error?.code === 'auth/invalid-email') {
+        throw new Error('Invalid email address');
+      } else if (error?.code === 'auth/weak-password') {
+        throw new Error('Password is too weak');
+      } else if (error?.code === 'auth/operation-not-allowed') {
+        throw new Error('Email/password accounts are not enabled');
+      }
       throw error;
     }
   },
@@ -55,14 +73,34 @@ export const authService = {
       const user = userCredential.user;
       
       // Get user profile from Firestore
-      const userDoc = await getDoc(doc(db, 'users', user.uid));
-      
-      if (userDoc.exists()) {
-        return userDoc.data() as UserProfile;
-      } else {
-        throw new Error('User profile not found');
+      try {
+        const userDoc = await getDoc(doc(db, 'users', user.uid));
+        
+        if (userDoc.exists()) {
+          return userDoc.data() as UserProfile;
+        } else {
+          throw new Error('User profile not found. Please contact support.');
+        }
+      } catch (firestoreError: any) {
+        // Handle Firestore permission errors specifically
+        if (firestoreError?.code === 'permission-denied' || firestoreError?.message?.includes('permission')) {
+          throw new Error('Permission denied: Unable to access user profile. Please ensure Firestore security rules are properly configured.');
+        }
+        throw firestoreError;
       }
-    } catch (error) {
+    } catch (error: any) {
+      // Re-throw with better context for authentication errors
+      if (error?.code === 'auth/invalid-email') {
+        throw new Error('Invalid email address');
+      } else if (error?.code === 'auth/user-disabled') {
+        throw new Error('This account has been disabled');
+      } else if (error?.code === 'auth/user-not-found') {
+        throw new Error('No account found with this email');
+      } else if (error?.code === 'auth/wrong-password') {
+        throw new Error('Incorrect password');
+      } else if (error?.code === 'auth/too-many-requests') {
+        throw new Error('Too many failed login attempts. Please try again later');
+      }
       throw error;
     }
   },
@@ -80,10 +118,21 @@ export const authService = {
   async getUserProfile(uid: string): Promise<UserProfile | null> {
     try {
       const userDoc = await getDoc(doc(db, 'users', uid));
-      return userDoc.exists() ? (userDoc.data() as UserProfile) : null;
-    } catch (error) {
-      console.error('Error getting user profile:', error);
+      if (userDoc.exists()) {
+        return userDoc.data() as UserProfile;
+      }
       return null;
+    } catch (error: any) {
+      // Log the error for debugging
+      console.error('Error getting user profile:', error);
+      
+      // Throw error with descriptive message for permission issues
+      if (error?.code === 'permission-denied' || error?.message?.includes('permission')) {
+        throw new Error('Permission denied: Unable to access user profile. Please ensure Firestore security rules allow users to read their own profile.');
+      }
+      
+      // For other errors, throw them so they can be handled upstream
+      throw error;
     }
   },
 
@@ -95,7 +144,15 @@ export const authService = {
         updatedAt: new Date()
       };
       
-      await updateDoc(doc(db, 'users', uid), updatedData);
+      try {
+        await updateDoc(doc(db, 'users', uid), updatedData);
+      } catch (firestoreError: any) {
+        // Handle Firestore permission errors specifically
+        if (firestoreError?.code === 'permission-denied' || firestoreError?.message?.includes('permission')) {
+          throw new Error('Permission denied: Unable to update user profile. Please ensure Firestore security rules allow users to update their own profile.');
+        }
+        throw firestoreError;
+      }
       
       // Get updated profile
       const updatedProfile = await this.getUserProfile(uid);
